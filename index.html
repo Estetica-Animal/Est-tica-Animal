@@ -4,10 +4,6 @@
 <meta charset="UTF-8" />
 <title>Estética Animal — Agenda & Financeiro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<!-- Flatpickr CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
 <style>
   :root{
     --rosa:#ff66a3;
@@ -39,7 +35,11 @@
   nav a:hover{background:#fff; color:var(--rosa)}
   nav a.ativo{background:#fff; color:var(--rosa)}
   
-  main{max-width:1200px; margin:86px auto 24px; padding:0 16px}
+  main{
+    max-width:1200px; 
+    margin:0 auto 24px;
+    padding:100px 16px 24px 16px; /* ESPAÇO PARA HEADER FIXO */
+  }
   #agendaMain{display:flex; gap:20px; align-items:flex-start}
   #calendario{flex:1; max-height:78vh; overflow-y:auto;}
   .mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra);}
@@ -50,8 +50,8 @@
   .dia-num{font-weight:bold; opacity:.8}
   .dia.hoje{outline:2px solid var(--rosa-escuro); background:#ffd1e3}
   .badge{display:block; width:100%; text-align:left; border:none; border-radius:8px; color:#fff; padding:6px 8px; margin-top:6px; cursor:pointer; position:relative; font-size:12px; line-height:1.2; box-shadow:0 2px 6px rgba(0,0,0,.08);}
-  .badge.avulso{background:var(--azul);}
-  .badge.pacote{background:var(--verde);}
+  .badge.avulso{background:var(--azul)}
+  .badge.pacote{background:var(--verde)}
   .badge.cancelado_cliente{filter:grayscale(.2); text-decoration:line-through; opacity:.8}
   .badge.cancelado_sistema{filter:grayscale(1); opacity:.5; border:1px dashed #900}
 
@@ -109,14 +109,13 @@
 
   #sidebar {
     width: 100%; /* sidebar ocupa toda a largura */
-    position: static !important; /* remove sticky */
+    position: static; /* remove sticky */
     top: auto;
     margin-top: 20px;
   }
 
   #calendario {
     max-height: none; /* permite rolar todo o calendário */
-    overflow-y: auto;
   }
 
   header .header-inner {
@@ -129,6 +128,10 @@
     padding: 6px 10px;
     font-size: 14px;
     margin-left: 0;
+  }
+
+  main {
+    padding-top: 120px; /* ajuste para telas pequenas */
   }
 
   #loginScreen input, #loginScreen button {
@@ -206,11 +209,11 @@
     </div>
     <div class="field">
       <label for="dataBanho">Data</label>
-      <input type="text" id="dataBanho" placeholder="Selecione a data"/>
+      <input type="date" id="dataBanho" />
     </div>
     <div class="field">
       <label for="horario">Horário</label>
-      <input type="text" id="horario" placeholder="Selecione o horário"/>
+      <input type="time" id="horario" />
     </div>
     <div class="field">
       <label for="valor">Valor
@@ -249,11 +252,11 @@
     <div class="row">
       <div class="field">
         <label>Data</label>
-        <input type="text" id="modalData" placeholder="Selecione a data">
+        <input type="date" id="modalData">
       </div>
       <div class="field">
         <label>Hora</label>
-        <input type="text" id="modalHora" placeholder="Selecione o horário">
+        <input type="time" id="modalHora">
       </div>
     </div>
     <div class="row" style="margin-top:8px">
@@ -275,9 +278,6 @@
     </div>
   </div>
 </div>
-
-<!-- Flatpickr JS -->
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
 /* ================= LOGIN ================= */
@@ -349,43 +349,33 @@ function renderCalendario(){
     const primeiroDiaSemana = (primeiroDia.getDay()+6)%7;
 
     const mesDiv = document.createElement('div');
-    mesDiv.className='mes';
-    mesDiv.innerHTML=`<h2>${nomesMeses[mes]}</h2>`;
-    const diasSemanaDiv = document.createElement('div');
-    diasSemanaDiv.className='dias-semana';
-    nomesDias.forEach(d=>{diasSemanaDiv.innerHTML+=`<div>${d}</div>`});
-    mesDiv.appendChild(diasSemanaDiv);
-
-    const diasDiv = document.createElement('div');
-    diasDiv.className='dias';
+    mesDiv.classList.add('mes');
+    mesDiv.innerHTML=`<h2>${nomesMeses[mes]} ${ano}</h2>
+      <div class="dias-semana">${nomesDias.map(d=>`<div>${d}</div>`).join('')}</div>
+      <div class="dias"></div>`;
+    const diasGrid = mesDiv.querySelector('.dias');
 
     for(let i=0;i<primeiroDiaSemana;i++){
-      const diaVazio = document.createElement('div');
-      diaVazio.className='dia';
-      diasDiv.appendChild(diaVazio);
+      const vazio = document.createElement('div');
+      diasGrid.appendChild(vazio);
     }
-
-    for(let d=1; d<=diasMes; d++){
-      const diaData = new Date(ano,mes,d);
+    for(let d=1;d<=diasMes;d++){
       const diaDiv = document.createElement('div');
-      diaDiv.className='dia';
-      if(diaData.toDateString()===hoje.toDateString()) diaDiv.classList.add('hoje');
-      diaDiv.innerHTML=`<div class="dia-num">${d}</div>`;
-      
-      banhos.filter(b=>b.data===diaData.toISOString().split('T')[0])
-            .forEach(b=>{
-              const btn = document.createElement('button');
-              btn.className=`badge ${b.tipo}`;
-              if(b.status==='cancelado_cliente') btn.className+=' cancelado_cliente';
-              if(b.status==='cancelado_sistema') btn.className+=' cancelado_sistema';
-              btn.innerText=`${b.cliente} ${b.hora}`;
-              btn.onclick=()=>abrirModal(b);
-              diaDiv.appendChild(btn);
-            });
-
-      diasDiv.appendChild(diaDiv);
+      diaDiv.classList.add('dia');
+      if(d===hoje.getDate() && mes===hoje.getMonth()) diaDiv.classList.add('hoje');
+      diaDiv.innerHTML=`<span class="dia-num">${d}</span>`;
+      const dataStr = `${ano}-${(mes+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+      const banhosDoDia = banhos.filter(b=>b.data===dataStr && b.status!=='cancelado_sistema');
+      banhosDoDia.forEach(b=>{
+        const btn = document.createElement('button');
+        btn.classList.add('badge',b.tipo);
+        if(b.status) btn.classList.add(b.status);
+        btn.textContent=`${b.cliente} (${b.horario})`;
+        btn.onclick=()=>abrirModal(b);
+        diaDiv.appendChild(btn);
+      });
+      diasGrid.appendChild(diaDiv);
     }
-    mesDiv.appendChild(diasDiv);
     calendario.appendChild(mesDiv);
   }
 }
@@ -396,108 +386,93 @@ function adicionarBanho(){
   const tutor = document.getElementById('tutor').value.trim();
   const cliente = document.getElementById('cliente').value.trim();
   const data = document.getElementById('dataBanho').value;
-  const hora = document.getElementById('horario').value;
-  const valor = parseFloat(document.getElementById('valor').value) || 0;
-  if(!tutor||!cliente||!data||!hora){alert('Preencha todos os campos'); return;}
-  const banho = {id:uid(), tipo,tutor,cliente,data,hora,valor,status:'ativo'};
+  const horario = document.getElementById('horario').value;
+  const valor = parseFloat(document.getElementById('valor').value)||0;
+  if(!tutor || !cliente || !data || !horario) return alert('Preencha todos os campos');
   const banhos = loadBanhos();
-  banhos.push(banho);
+  banhos.push({id:uid(), tipo, tutor, cliente, data, horario, valor, status:''});
   saveBanhos(banhos);
   renderCalendario();
   renderFinanceiro();
-}
-
-/* ================= MODAL ================= */
-function abrirModal(banho){
-  document.getElementById('modalBackdrop').style.display='flex';
-  document.getElementById('modalTitulo').innerText=`Agendamento - ${banho.cliente}`;
-  document.getElementById('modalData')._flatpickr.setDate(banho.data);
-  document.getElementById('modalHora')._flatpickr.setDate(banho.hora,false,'H:i');
-  document.getElementById('modalValor').value=banho.valor;
-  document.getElementById('modalTipo').value=banho.tipo;
-  window.modalBanho=banho;
-  document.getElementById('btnReativar').classList.toggle('hidden', banho.status==='ativo');
-}
-function fecharModal(e){document.getElementById('modalBackdrop').style.display='none';}
-function cancelarModal(tipo){
-  if(!window.modalBanho) return;
-  const banhos = loadBanhos();
-  const idx = banhos.findIndex(b=>b.id===window.modalBanho.id);
-  if(idx===-1) return;
-  if(tipo==='cliente') banhos[idx].status='cancelado_cliente';
-  else if(tipo==='sistema') banhos[idx].status='cancelado_sistema';
-  saveBanhos(banhos);
-  renderCalendario();
-  renderFinanceiro();
-  fecharModal();
-}
-function reativarModal(){
-  if(!window.modalBanho) return;
-  const banhos = loadBanhos();
-  const idx = banhos.findIndex(b=>b.id===window.modalBanho.id);
-  if(idx===-1) return;
-  banhos[idx].status='ativo';
-  saveBanhos(banhos);
-  renderCalendario();
-  renderFinanceiro();
-  fecharModal();
-}
-function salvarEdicao(){
-  if(!window.modalBanho) return;
-  const banhos = loadBanhos();
-  const idx = banhos.findIndex(b=>b.id===window.modalBanho.id);
-  if(idx===-1) return;
-  banhos[idx].data=document.getElementById('modalData').value;
-  banhos[idx].hora=document.getElementById('modalHora').value;
-  banhos[idx].valor=parseFloat(document.getElementById('modalValor').value)||0;
-  saveBanhos(banhos);
-  renderCalendario();
-  renderFinanceiro();
-  fecharModal();
 }
 
 /* ================= FINANCEIRO ================= */
 function renderFinanceiro(){
-  const banhos = loadBanhos();
-  const hojeStr = hoje.toISOString().split('T')[0];
-  const totalDia = banhos.filter(b=>b.data===hojeStr && b.status==='ativo').reduce((s,b)=>s+b.valor,0);
-  const totalMes = banhos.filter(b=>b.data.startsWith(`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}`) && b.status==='ativo').reduce((s,b)=>s+b.valor,0);
-  const clientes = [...new Set(banhos.filter(b=>b.status==='ativo').map(b=>b.cliente))];
-  const ticketMedio = totalMes/clientes.length||0;
+  const banhos = loadBanhos().filter(b=>b.status!=='cancelado_sistema');
+  const totalDia = banhos.filter(b=>b.data===hoje.toISOString().slice(0,10)).reduce((a,b)=>a+b.valor,0);
+  const totalMes = banhos.filter(b=>b.data.startsWith(hoje.toISOString().slice(0,7))).reduce((a,b)=>a+b.valor,0);
+  const ticketMedio = banhos.length? (totalMes/banhos.length).toFixed(2):0;
+  const clientesSet = new Set(banhos.map(b=>b.cliente));
+  document.getElementById('totalDia').textContent=`R$ ${totalDia.toFixed(2)}`;
+  document.getElementById('totalMes').textContent=`R$ ${totalMes.toFixed(2)}`;
+  document.getElementById('ticketMedio').textContent=`R$ ${ticketMedio}`;
+  document.getElementById('totalClientes').textContent=clientesSet.size;
 
-  document.getElementById('totalDia').innerText=`R$ ${totalDia.toFixed(2)}`;
-  document.getElementById('totalMes').innerText=`R$ ${totalMes.toFixed(2)}`;
-  document.getElementById('ticketMedio').innerText=`R$ ${ticketMedio.toFixed(2)}`;
-  document.getElementById('totalClientes').innerText=clientes.length;
-
-  const tbody = document.getElementById('listaBanhos');
-  tbody.innerHTML='';
-  banhos.forEach((b,i)=>{
+  const lista = document.getElementById('listaBanhos');
+  lista.innerHTML='';
+  banhos.forEach(b=>{
     const tr = document.createElement('tr');
-    tr.innerHTML=`
-      <td>${i+1}</td>
-      <td>${b.cliente}</td>
-      <td>${b.tutor}</td>
-      <td>${b.data}</td>
-      <td>${b.hora}</td>
-      <td>R$ ${b.valor.toFixed(2)}</td>
-      <td>${b.tipo}</td>
-      <td>${b.status}</td>
-      <td class="t-actions">
-        <button class="mini edit" onclick="abrirModal(loadBanhos().find(x=>x.id==='${b.id}'))">✏️</button>
-        <button class="mini" onclick="cancelarModal('cliente')">🚫</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
+    tr.innerHTML=`<td>${b.id}</td><td>${b.cliente}</td><td>${b.tutor}</td><td>${b.data}</td><td>${b.horario}</td><td>${b.valor.toFixed(2)}</td><td>${b.tipo}</td><td>${b.status||'Ativo'}</td>
+    <td class="t-actions">
+      <button class="mini edit" onclick="abrirModal(${JSON.stringify(b)})">✏️</button>
+    </td>`;
+    lista.appendChild(tr);
   });
 }
 
-/* ================= FLATPICKR ================= */
-flatpickr("#dataBanho", { dateFormat: "Y-m-d" });
-flatpickr("#modalData", { dateFormat: "Y-m-d" });
-flatpickr("#horario", { enableTime: true, noCalendar: true, dateFormat: "H:i" });
-flatpickr("#modalHora", { enableTime: true, noCalendar: true, dateFormat: "H:i" });
+/* ================= MODAL ================= */
+function abrirModal(b){
+  const modal = document.getElementById('modalBackdrop');
+  modal.style.display='flex';
+  document.getElementById('modalTitulo').textContent=`Agendamento - ${b.cliente}`;
+  document.getElementById('modalData').value=b.data;
+  document.getElementById('modalHora').value=b.horario;
+  document.getElementById('modalValor').value=b.valor;
+  document.getElementById('modalTipo').value=b.tipo;
+  document.getElementById('btnReativar').classList.toggle('hidden', b.status!=='cancelado_cliente');
+  modal.dataset.id = b.id;
+}
+function fecharModal(e){if(!e || e.target===document.getElementById('modalBackdrop')) document.getElementById('modalBackdrop').style.display='none'}
+function salvarEdicao(){
+  const id = document.getElementById('modalBackdrop').dataset.id;
+  const banhos = loadBanhos();
+  const b = banhos.find(x=>x.id===id);
+  if(!b) return;
+  b.data = document.getElementById('modalData').value;
+  b.horario = document.getElementById('modalHora').value;
+  b.valor = parseFloat(document.getElementById('modalValor').value)||0;
+  saveBanhos(banhos);
+  fecharModal();
+  renderCalendario();
+  renderFinanceiro();
+}
+function cancelarModal(tipo){
+  const id = document.getElementById('modalBackdrop').dataset.id;
+  const banhos = loadBanhos();
+  const b = banhos.find(x=>x.id===id);
+  if(!b) return;
+  b.status = tipo==='cliente'?'cancelado_cliente':'cancelado_sistema';
+  saveBanhos(banhos);
+  fecharModal();
+  renderCalendario();
+  renderFinanceiro();
+}
+function reativarModal(){
+  const id = document.getElementById('modalBackdrop').dataset.id;
+  const banhos = loadBanhos();
+  const b = banhos.find(x=>x.id===id);
+  if(!b) return;
+  b.status='';
+  saveBanhos(banhos);
+  fecharModal();
+  renderCalendario();
+  renderFinanceiro();
+}
 
+/* ================= INICIALIZAÇÃO ================= */
+renderCalendario();
+renderFinanceiro();
 </script>
+
 </body>
 </html>
