@@ -181,122 +181,129 @@ function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.
 function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');renderCalendario();atualizarTutoresSelect();}
 function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');renderTutores();}
 
+
 /* TUTORES */
 function adicionarTutor(){
   const nome=document.getElementById('tutorNome').value.trim();
   const endereco=document.getElementById('tutorEndereco').value.trim();
   const tel=document.getElementById('tutorTelefone').value.trim();
   if(!nome) return alert('Informe o nome');
+
   const tutores=load(LS_TUTORES);
   tutores.push({id:uid(),nome,endereco,tel,animais:[]});
   save(LS_TUTORES,tutores);
-  document.getElementById('tutorNome').value=''; document.getElementById('tutorEndereco').value=''; document.getElementById('tutorTelefone').value='';
-  renderTutores(); atualizarTutoresSelect();
+
+  // Limpa campos
+  document.getElementById('tutorNome').value='';
+  document.getElementById('tutorEndereco').value='';
+  document.getElementById('tutorTelefone').value='';
+
+  renderTutores();
+  atualizarTutoresSelect(); // Atualiza select corretamente
 }
+
 function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
   const file=document.getElementById('animalFoto').files[0];
-  if(!tutorId||!nome) return alert('Preencha os campos');
+
+  if(!tutorId) return alert('Selecione um tutor');
+  if(!nome) return alert('Informe o nome do cliente');
+
   if(file){
     const reader=new FileReader();
-    reader.onload=function(e){salvarAnimal(tutorId,nome,e.target.result)};
+    reader.onload=e=> salvarAnimal(tutorId,nome,e.target.result);
     reader.readAsDataURL(file);
-  } else salvarAnimal(tutorId,nome,'');
+  } else {
+    salvarAnimal(tutorId,nome,'');
+  }
 }
+
 function salvarAnimal(tutorId,nome,foto){
   const tutores=load(LS_TUTORES);
   const t=tutores.find(x=>x.id===tutorId);
   if(!t) return;
+
   t.animais.push({id:uid(),nome,foto});
   save(LS_TUTORES,tutores);
-  document.getElementById('animalNome').value=''; document.getElementById('animalFoto').value='';
-  renderTutores(); atualizarTutoresSelect();
+
+  document.getElementById('animalNome').value='';
+  document.getElementById('animalFoto').value='';
+
+  renderTutores();
+  atualizarTutoresSelect();
 }
+
 function renderTutores(){
   const tutores=load(LS_TUTORES);
   const container=document.getElementById('tutoresContainer');
   const sel=document.getElementById('animalTutor');
-  container.innerHTML=''; sel.innerHTML='<option value="">Selecione um Tutor</option>';
+
+  container.innerHTML='';
+  sel.innerHTML='<option value="">Selecione um Tutor</option>';
+
   tutores.forEach(t=>{
     sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
+
     const div=document.createElement('div');
     div.classList.add('tutor-card');
     div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco} - ${t.tel}`;
+
     const btnEditar=document.createElement('i');
-    btnEditar.classList.add('fa-solid','fa-pencil','edit-icon');
-    btnEditar.title='Editar Tutor';
+    btnEditar.className="fa-solid fa-pencil edit-icon";
     btnEditar.onclick=()=>editarTutor(t.id);
+
     const btnExcluir=document.createElement('i');
-    btnExcluir.classList.add('fa-solid','fa-trash','edit-icon');
-    btnExcluir.title='Excluir Tutor';
+    btnExcluir.className="fa-solid fa-trash edit-icon";
     btnExcluir.onclick=()=>excluirTutor(t.id);
+
     div.appendChild(btnEditar);
     div.appendChild(btnExcluir);
+
     t.animais.forEach(a=>{
       const an=document.createElement('div');
       an.classList.add('animal');
-      if(a.foto) an.innerHTML=`<div style="display:flex;align-items:center;gap:6px;"><img src="${a.foto}"><span>${a.nome}</span></div>`;
-      else an.innerHTML=`<span>${a.nome}</span>`;
+      an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
+
       const editAni=document.createElement('i');
-      editAni.classList.add('fa-solid','fa-pencil','edit-icon');
-      editAni.title='Editar Cliente';
+      editAni.className="fa-solid fa-pencil edit-icon";
       editAni.onclick=()=>editarAnimal(t.id,a.id);
+
       const delAni=document.createElement('i');
-      delAni.classList.add('fa-solid','fa-trash','edit-icon');
-      delAni.title='Excluir Cliente';
+      delAni.className="fa-solid fa-trash edit-icon";
       delAni.onclick=()=>excluirAnimal(t.id,a.id);
+
       an.appendChild(editAni);
       an.appendChild(delAni);
       div.appendChild(an);
     });
+
     container.appendChild(div);
   });
 }
-function editarTutor(id){
+
+function atualizarTutoresSelect(){
   const tutores=load(LS_TUTORES);
-  const t=tutores.find(x=>x.id===id);
-  if(!t) return;
-  const nome=prompt("Editar nome do tutor:", t.nome);
-  const endereco=prompt("Editar endereço:", t.endereco);
-  const tel=prompt("Editar telefone:", t.tel);
-  if(nome && endereco && tel){
-    t.nome=nome; t.endereco=endereco; t.tel=tel;
-    save(LS_TUTORES,tutores);
-    renderTutores();
-    atualizarTutoresSelect();
-  }
+  const sel=document.getElementById('tutorSelect');
+  sel.innerHTML='<option value="">Selecione um tutor</option>';
+  tutores.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
+  carregarAnimais();
+
+  // Atualiza também o select do cadastro de animais
+  const selAnim=document.getElementById('animalTutor');
+  selAnim.innerHTML='<option value="">Selecione um Tutor</option>';
+  tutores.forEach(t=> selAnim.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
 }
-function editarAnimal(tutorId,animalId){
-  const tutores=load(LS_TUTORES);
-  const t=tutores.find(x=>x.id===tutorId);
-  if(!t) return;
-  const a=t.animais.find(x=>x.id===animalId);
-  if(!a) return;
-  const nome=prompt("Editar nome do cliente:", a.nome);
-  if(nome){
-    a.nome=nome;
-    save(LS_TUTORES,tutores);
-    renderTutores();
-    atualizarTutoresSelect();
-  }
-}
-function excluirTutor(id){
-  let tutores=load(LS_TUTORES);
-  tutores=tutores.filter(t=>t.id!==id);
-  save(LS_TUTORES,tutores);
-  renderTutores();
-  atualizarTutoresSelect();
-}
-function excluirAnimal(tutorId,animalId){
+
+function carregarAnimais(){
+  const tutorId=document.getElementById('tutorSelect').value;
   const tutores=load(LS_TUTORES);
   const t=tutores.find(x=>x.id===tutorId);
-  if(!t) return;
-  t.animais=t.animais.filter(a=>a.id!==animalId);
-  save(LS_TUTORES,tutores);
-  renderTutores();
-  atualizarTutoresSelect();
+  const sel=document.getElementById('animalSelect');
+  sel.innerHTML='<option value="">Selecione um cliente</option>';
+  if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
 }
+
 
 /* BANHOS */
 function adicionarBanho(){
@@ -306,3 +313,4 @@ function adicionarBanho(){
   const data=document.getElementById('dataBanho').value;
   const horario=document.getElementById('horario').value;
  
+
