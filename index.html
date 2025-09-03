@@ -159,17 +159,47 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 </main>
 
 <script>
-/* LOGIN */
+<script>
+/* LOGIN SIMPLIFICADO */
 const usuarios=[{user:'Kamilly',pass:'petshop2025'},{user:'Leocir',pass:'admin'}];
+
 function fazerLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value.trim();
-  const ok=usuarios.find(x=>x.user===u&&x.pass===p);
+  const ok=usuarios.find(x=>x.user===u && x.pass===p);
   if(ok){
     document.getElementById('loginScreen').style.display='none';
-    mostrarAgenda();
-  } else alert('Usuário ou senha incorretos');
+    mostrarAgenda(); // chama a função de mostrar agenda
+  } else {
+    alert('Usuário ou senha incorretos');
+  }
 }
+
+/* AGENDA SIMPLIFICADA */
+function mostrarAgenda(){
+  document.getElementById('agendaMain').style.display='flex';
+  document.getElementById('tutoresSec').style.display='none';
+  setAtivo('navAgenda');
+  renderCalendario();
+}
+
+function setAtivo(id){
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));
+  document.getElementById(id).classList.add('ativo');
+}
+
+function renderCalendario(){
+  const calendario=document.getElementById('calendario');
+  calendario.innerHTML='<div class="mes"><h2>Calendário</h2><div class="dias-semana">D S T Q Q S S</div><div class="dias">Selecione uma data</div></div>';
+}
+
+/* Inicialização */
+window.onload=()=>{
+  document.getElementById('agendaMain').style.display='flex';
+  document.getElementById('tutoresSec').style.display='none';
+};
+</script>
+
 
 /* STORAGE */
 const LS_TUTORES='tutores';
@@ -369,3 +399,4 @@ window.onload=()=>{
 
 </body>
 </html>
+
