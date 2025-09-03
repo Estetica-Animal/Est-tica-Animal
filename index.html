@@ -165,8 +165,10 @@ function fazerLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value.trim();
   const ok=usuarios.find(x=>x.user===u&&x.pass===p);
-  if(ok){document.getElementById('loginScreen').style.display='none'; mostrarAgenda();}
-  else alert('Usuário ou senha incorretos');
+  if(ok){
+    document.getElementById('loginScreen').style.display='none';
+    mostrarAgenda();
+  } else alert('Usuário ou senha incorretos');
 }
 
 /* STORAGE */
@@ -181,6 +183,21 @@ function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.
 function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');renderCalendario();atualizarTutoresSelect();}
 function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');renderTutores();}
 
+/* FUNÇÕES DO CALENDÁRIO (SIMPLIFICADO) */
+function renderCalendario(){
+  const calendario=document.getElementById('calendario');
+  calendario.innerHTML='';
+  const mesDiv=document.createElement('div');
+  mesDiv.className='mes';
+  mesDiv.innerHTML='<h2>Calendário</h2><div class="dias-semana">D S T Q Q S S</div><div class="dias">Selecione uma data</div>';
+  calendario.appendChild(mesDiv);
+}
+
+/* TIPO DE PACOTE */
+function togglePacoteOptions(){
+  const tipo=document.getElementById('tipoBanho').value;
+  document.getElementById('pacoteOptions').style.display=(tipo==='pacote')?'block':'none';
+}
 
 /* TUTORES */
 function adicionarTutor(){
@@ -193,20 +210,18 @@ function adicionarTutor(){
   tutores.push({id:uid(),nome,endereco,tel,animais:[]});
   save(LS_TUTORES,tutores);
 
-  // Limpa campos
   document.getElementById('tutorNome').value='';
   document.getElementById('tutorEndereco').value='';
   document.getElementById('tutorTelefone').value='';
 
   renderTutores();
-  atualizarTutoresSelect(); // Atualiza select corretamente
+  atualizarTutoresSelect();
 }
 
 function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
   const file=document.getElementById('animalFoto').files[0];
-
   if(!tutorId) return alert('Selecione um tutor');
   if(!nome) return alert('Informe o nome do cliente');
 
@@ -214,16 +229,13 @@ function adicionarAnimal(){
     const reader=new FileReader();
     reader.onload=e=> salvarAnimal(tutorId,nome,e.target.result);
     reader.readAsDataURL(file);
-  } else {
-    salvarAnimal(tutorId,nome,'');
-  }
+  } else salvarAnimal(tutorId,nome,'');
 }
 
 function salvarAnimal(tutorId,nome,foto){
   const tutores=load(LS_TUTORES);
   const t=tutores.find(x=>x.id===tutorId);
   if(!t) return;
-
   t.animais.push({id:uid(),nome,foto});
   save(LS_TUTORES,tutores);
 
@@ -244,14 +256,13 @@ function renderTutores(){
 
   tutores.forEach(t=>{
     sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
-
     const div=document.createElement('div');
-    div.classList.add('tutor-card');
+    div.className='tutor-card';
     div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco} - ${t.tel}`;
 
     const btnEditar=document.createElement('i');
     btnEditar.className="fa-solid fa-pencil edit-icon";
-    btnEditar.onclick=()=>editarTutor(t.id);
+    btnEditar.onclick=()=>alert('Editar Tutor: '+t.nome);
 
     const btnExcluir=document.createElement('i');
     btnExcluir.className="fa-solid fa-trash edit-icon";
@@ -262,12 +273,12 @@ function renderTutores(){
 
     t.animais.forEach(a=>{
       const an=document.createElement('div');
-      an.classList.add('animal');
+      an.className='animal';
       an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
 
       const editAni=document.createElement('i');
       editAni.className="fa-solid fa-pencil edit-icon";
-      editAni.onclick=()=>editarAnimal(t.id,a.id);
+      editAni.onclick=()=>alert('Editar Cliente: '+a.nome);
 
       const delAni=document.createElement('i');
       delAni.className="fa-solid fa-trash edit-icon";
@@ -289,7 +300,6 @@ function atualizarTutoresSelect(){
   tutores.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
   carregarAnimais();
 
-  // Atualiza também o select do cadastro de animais
   const selAnim=document.getElementById('animalTutor');
   selAnim.innerHTML='<option value="">Selecione um Tutor</option>';
   tutores.forEach(t=> selAnim.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
@@ -304,6 +314,26 @@ function carregarAnimais(){
   if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
 }
 
+/* EXCLUIR TUTOR/ANIMAL */
+function excluirTutor(id){
+  if(!confirm('Deseja realmente excluir este tutor?')) return;
+  let tutores=load(LS_TUTORES);
+  tutores=tutores.filter(t=>t.id!==id);
+  save(LS_TUTORES,tutores);
+  renderTutores();
+  atualizarTutoresSelect();
+}
+
+function excluirAnimal(tutorId, animalId){
+  if(!confirm('Deseja realmente excluir este cliente?')) return;
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===tutorId);
+  if(!t) return;
+  t.animais=t.animais.filter(a=>a.id!==animalId);
+  save(LS_TUTORES,tutores);
+  renderTutores();
+  atualizarTutoresSelect();
+}
 
 /* BANHOS */
 function adicionarBanho(){
@@ -312,5 +342,30 @@ function adicionarBanho(){
   const animalId=document.getElementById('animalSelect').value;
   const data=document.getElementById('dataBanho').value;
   const horario=document.getElementById('horario').value;
- 
+  const valor=document.getElementById('valor').value;
 
+  if(!tutorId || !animalId || !data || !horario || !valor) return alert('Preencha todos os campos');
+
+  const banhos=load(LS_BANHOS);
+  banhos.push({id:uid(),tipo,tutorId,animalId,data,horario,valor});
+  save(LS_BANHOS,banhos);
+
+  alert('Banho adicionado com sucesso!');
+  document.getElementById('tipoBanho').value='avulso';
+  togglePacoteOptions();
+  document.getElementById('tutorSelect').value='';
+  document.getElementById('animalSelect').value='';
+  document.getElementById('dataBanho').value='';
+  document.getElementById('horario').value='';
+  document.getElementById('valor').value='';
+}
+
+/* Inicialização */
+window.onload=()=>{
+  renderTutores();
+  atualizarTutoresSelect();
+};
+</script>
+
+</body>
+</html>
