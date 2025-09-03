@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <title>Estética Animal — Agenda & Tutores</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{
   --rosa:#ff66a3;
@@ -18,15 +18,23 @@
   --cinza:#d6d6d6;
 }
 *{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto); margin:0; position:relative; min-height:100vh;}
-header{position:fixed; top:0; left:0; right:0; background:var(--rosa); color:#fff; z-index:1000; box-shadow:var(--sombra);}
-.header-inner{max-width:1200px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; justify-content:center; gap:50px;}
-header h1{margin:0; font-size:20px; display:flex; align-items:center; gap:10px;}
+body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto); margin:0;}
+
+header{
+  position:fixed; top:0; left:0; right:0; background:var(--rosa); color:#fff; z-index:1000; box-shadow:var(--sombra);
+}
+.header-inner{
+  max-width:1200px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
+}
+header h1{
+  margin:0; font-size:20px; display:flex; align-items:center; gap:10px;
+}
 #logoHeader{width:40px;height:40px;border-radius:50%;object-fit:cover;}
-nav{display:flex; gap:20px; justify-content:center; align-items:center;}
+nav{display:flex; gap:20px; justify-content:center; align-items:center; flex:1;}
 nav a{display:inline-block; color:#fff; text-decoration:none; font-weight:bold; padding:8px 12px; border-radius:20px; transition:.2s;}
 nav a:hover{background:#fff; color:var(--rosa)}
 nav a.ativo{background:#fff; color:var(--rosa)}
+
 main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
 /* ======= AGENDA ======= */
@@ -43,7 +51,6 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 .badge.avulso{background:var(--azul)}
 .badge.pacote{background:var(--verde)}
 
-/* Sidebar form */
 #sidebar{width:320px; background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--sombra); position:sticky; top:92px;}
 #sidebar h3{margin-top:0; color:var(--rosa-escuro); text-align:center}
 .field{margin-bottom:10px}
@@ -52,8 +59,6 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 .btn{display:inline-block; width:100%; border:none; border-radius:10px; padding:10px 12px; font-weight:bold; cursor:pointer; transition:.2s; box-shadow:var(--sombra);}
 .btn:hover{transform:translateY(-1px)}
 .btn-avulso{background:var(--azul); color:#fff}
-.btn-editar{background:#ffc107; color:#fff; margin-top:6px;}
-.btn-excluir{background:#dc3545; color:#fff; margin-top:6px;}
 
 /* ======= TUTORES ======= */
 #tutoresSec{display:none; display:grid; grid-template-columns:1fr; gap:20px;}
@@ -61,20 +66,17 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 #listaTutores h3{margin-top:0; color:var(--rosa-escuro);}
 .tutor-card{border-bottom:1px solid #eee; padding:10px 0; display:flex; flex-direction:column; gap:6px;}
 .tutor-card span{font-size:14px;}
-.animal{display:flex; align-items:center; gap:10px; margin-top:6px;}
+.animal{display:flex; align-items:center; gap:10px; margin-top:6px; justify-content:space-between;}
 .animal img{width:40px; height:40px; border-radius:50%; object-fit:cover;}
-.icon-btn{background:none;border:none;cursor:pointer;font-size:16px;color:var(--rosa-escuro);margin-left:6px;}
-.icon-btn:hover{color:var(--rosa)}
+.edit-icon{cursor:pointer; color:var(--rosa-escuro); margin-left:6px;}
+.edit-icon:hover{color:var(--rosa);}
 
-/* LOGIN */
+/* ======= LOGIN ======= */
 #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
 #loginScreen h2{margin-bottom:20px; color:var(--rosa-escuro);}
 #loginScreen input{width:220px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
 #loginScreen button{width:100%; max-width:240px; padding:10px; margin-top:12px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
 #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
-
-/* Marca d'água */
-footer{position:absolute; bottom:0; left:0; width:100%; text-align:center; font-size:12px; color:#aaa; padding:12px;}
 </style>
 </head>
 <body>
@@ -137,16 +139,16 @@ footer{position:absolute; bottom:0; left:0; width:100%; text-align:center; font-
   <section id="tutoresSec">
     <div id="formTutor">
       <h3>Cadastrar Tutor</h3>
-      <div class="field"><input type="text" id="tutorNome" placeholder="Nome completo" /></div>
-      <div class="field"><input type="text" id="tutorEndereco" placeholder="Endereço" /></div>
-      <div class="field"><input type="text" id="tutorTelefone" placeholder="Telefone" /></div>
+      <input type="text" id="tutorNome" placeholder="Nome completo" /><br>
+      <input type="text" id="tutorEndereco" placeholder="Endereço" /><br>
+      <input type="text" id="tutorTelefone" placeholder="Telefone" /><br>
       <button class="btn btn-avulso" onclick="adicionarTutor()">Salvar Tutor</button>
     </div>
     <div id="formAnimal">
       <h3>Adicionar Cliente</h3>
-      <div class="field"><select id="animalTutor"></select></div>
-      <div class="field"><input type="text" id="animalNome" placeholder="Nome do Cliente" /></div>
-      <div class="field"><input type="file" id="animalFoto" accept="image/*" /></div>
+      <select id="animalTutor"></select><br>
+      <input type="text" id="animalNome" placeholder="Nome do Cliente" /><br>
+      <input type="file" id="animalFoto" accept="image/*" /><br>
       <button class="btn btn-avulso" onclick="adicionarAnimal()">Salvar Cliente</button>
     </div>
     <div id="listaTutores">
@@ -155,8 +157,6 @@ footer{position:absolute; bottom:0; left:0; width:100%; text-align:center; font-
     </div>
   </section>
 </main>
-
-<footer>Desenvolvido por Leocir</footer>
 
 <script>
 /* LOGIN */
@@ -182,77 +182,127 @@ function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agend
 function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');renderTutores();}
 
 /* TUTORES */
-//... (mantém funções de adicionar/editar/excluir tutores e clientes, iguais ao código anterior) ...
+function adicionarTutor(){
+  const nome=document.getElementById('tutorNome').value.trim();
+  const endereco=document.getElementById('tutorEndereco').value.trim();
+  const tel=document.getElementById('tutorTelefone').value.trim();
+  if(!nome) return alert('Informe o nome');
+  const tutores=load(LS_TUTORES);
+  tutores.push({id:uid(),nome,endereco,tel,animais:[]});
+  save(LS_TUTORES,tutores);
+  document.getElementById('tutorNome').value=''; document.getElementById('tutorEndereco').value=''; document.getElementById('tutorTelefone').value='';
+  renderTutores(); atualizarTutoresSelect();
+}
+function adicionarAnimal(){
+  const tutorId=document.getElementById('animalTutor').value;
+  const nome=document.getElementById('animalNome').value.trim();
+  const file=document.getElementById('animalFoto').files[0];
+  if(!tutorId||!nome) return alert('Preencha os campos');
+  if(file){
+    const reader=new FileReader();
+    reader.onload=function(e){salvarAnimal(tutorId,nome,e.target.result)};
+    reader.readAsDataURL(file);
+  } else salvarAnimal(tutorId,nome,'');
+}
+function salvarAnimal(tutorId,nome,foto){
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===tutorId);
+  if(!t) return;
+  t.animais.push({id:uid(),nome,foto});
+  save(LS_TUTORES,tutores);
+  document.getElementById('animalNome').value=''; document.getElementById('animalFoto').value='';
+  renderTutores(); atualizarTutoresSelect();
+}
+function renderTutores(){
+  const tutores=load(LS_TUTORES);
+  const container=document.getElementById('tutoresContainer');
+  const sel=document.getElementById('animalTutor');
+  container.innerHTML=''; sel.innerHTML='<option value="">Selecione um Tutor</option>';
+  tutores.forEach(t=>{
+    sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
+    const div=document.createElement('div');
+    div.classList.add('tutor-card');
+    div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco} - ${t.tel}`;
+    const btnEditar=document.createElement('i');
+    btnEditar.classList.add('fa-solid','fa-pencil','edit-icon');
+    btnEditar.title='Editar Tutor';
+    btnEditar.onclick=()=>editarTutor(t.id);
+    const btnExcluir=document.createElement('i');
+    btnExcluir.classList.add('fa-solid','fa-trash','edit-icon');
+    btnExcluir.title='Excluir Tutor';
+    btnExcluir.onclick=()=>excluirTutor(t.id);
+    div.appendChild(btnEditar);
+    div.appendChild(btnExcluir);
+    t.animais.forEach(a=>{
+      const an=document.createElement('div');
+      an.classList.add('animal');
+      if(a.foto) an.innerHTML=`<div style="display:flex;align-items:center;gap:6px;"><img src="${a.foto}"><span>${a.nome}</span></div>`;
+      else an.innerHTML=`<span>${a.nome}</span>`;
+      const editAni=document.createElement('i');
+      editAni.classList.add('fa-solid','fa-pencil','edit-icon');
+      editAni.title='Editar Cliente';
+      editAni.onclick=()=>editarAnimal(t.id,a.id);
+      const delAni=document.createElement('i');
+      delAni.classList.add('fa-solid','fa-trash','edit-icon');
+      delAni.title='Excluir Cliente';
+      delAni.onclick=()=>excluirAnimal(t.id,a.id);
+      an.appendChild(editAni);
+      an.appendChild(delAni);
+      div.appendChild(an);
+    });
+    container.appendChild(div);
+  });
+}
+function editarTutor(id){
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===id);
+  if(!t) return;
+  const nome=prompt("Editar nome do tutor:", t.nome);
+  const endereco=prompt("Editar endereço:", t.endereco);
+  const tel=prompt("Editar telefone:", t.tel);
+  if(nome && endereco && tel){
+    t.nome=nome; t.endereco=endereco; t.tel=tel;
+    save(LS_TUTORES,tutores);
+    renderTutores();
+    atualizarTutoresSelect();
+  }
+}
+function editarAnimal(tutorId,animalId){
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===tutorId);
+  if(!t) return;
+  const a=t.animais.find(x=>x.id===animalId);
+  if(!a) return;
+  const nome=prompt("Editar nome do cliente:", a.nome);
+  if(nome){
+    a.nome=nome;
+    save(LS_TUTORES,tutores);
+    renderTutores();
+    atualizarTutoresSelect();
+  }
+}
+function excluirTutor(id){
+  let tutores=load(LS_TUTORES);
+  tutores=tutores.filter(t=>t.id!==id);
+  save(LS_TUTORES,tutores);
+  renderTutores();
+  atualizarTutoresSelect();
+}
+function excluirAnimal(tutorId,animalId){
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===tutorId);
+  if(!t) return;
+  t.animais=t.animais.filter(a=>a.id!==animalId);
+  save(LS_TUTORES,tutores);
+  renderTutores();
+  atualizarTutoresSelect();
+}
 
 /* BANHOS */
 function adicionarBanho(){
   const tipo=document.getElementById('tipoBanho').value;
-  const pacote=document.getElementById('pacoteSelecionado').value;
-  const tutor=document.getElementById('tutorSelect').value;
-  const animal=document.getElementById('animalSelect').value;
+  const tutorId=document.getElementById('tutorSelect').value;
+  const animalId=document.getElementById('animalSelect').value;
   const data=document.getElementById('dataBanho').value;
   const horario=document.getElementById('horario').value;
-  const valor=document.getElementById('valor').value;
-  if(!tutor||!animal||!data||!horario||!valor) return alert('Preencha todos os campos');
-  const banhos=load(LS_BANHOS);
-  if(tipo==='avulso'){ 
-    banhos.push({id:uid(),tutor,animal,data,horario,valor,status:'pago',tipo:'avulso',ordem:1,total:1}); 
-  } else {
-    const n=parseInt(pacote);
-    for(let i=0;i<n;i++){
-      const d=new Date(data);
-      d.setDate(d.getDate()+7*i);
-      banhos.push({id:uid(),tutor,animal,data:d.toISOString().split('T')[0],horario,valor:i===0?valor:'',tipo:'pacote',ordem:i+1,total:n});
-    }
-  }
-  save(LS_BANHOS,banhos);
-  renderCalendario();
-}
-
-/* CALENDARIO COM SEGUNDA-FEIRA COMO PRIMEIRO DIA */
-function renderCalendario(){
-  const container=document.getElementById('calendario'); container.innerHTML='';
-  const hoje=new Date();
-  const banhos=load(LS_BANHOS);
-  const tutores=load(LS_TUTORES);
-  const meses=[hoje.getMonth(),hoje.getMonth()+1];
-  meses.forEach(m=>{
-    const mesDate=new Date(hoje.getFullYear(),m,1);
-    const mesDiv=document.createElement('div'); mesDiv.className='mes';
-    const nomeMes=mesDate.toLocaleString('pt-BR',{month:'long',year:'numeric'});
-    mesDiv.innerHTML=`<h2>${nomeMes}</h2>`;
-    const diasSemana=['Seg','Ter','Qua','Qui','Sex','Sab','Dom'];
-    const ds=document.createElement('div'); ds.className='dias-semana';
-    diasSemana.forEach(d=>ds.innerHTML+=`<div>${d}</div>`); mesDiv.appendChild(ds);
-    const diasContainer=document.createElement('div'); diasContainer.className='dias';
-    const firstDay=(new Date(hoje.getFullYear(),m,1).getDay()+6)%7; // Ajuste: segunda=0
-    const lastDay=new Date(hoje.getFullYear(),m+1,0).getDate();
-    for(let i=0;i<firstDay;i++){const d=document.createElement('div'); diasContainer.appendChild(d);}
-    for(let d=1;d<=lastDay;d++){
-      const diaDiv=document.createElement('div'); diaDiv.className='dia';
-      const dataStr=new Date(hoje.getFullYear(),m,d).toISOString().split('T')[0];
-      if(d===hoje.getDate()&&m===hoje.getMonth()) diaDiv.classList.add('hoje');
-      diasContainer.appendChild(diaDiv);
-      banhos.filter(b=>b.data===dataStr).forEach(b=>{
-        const t=tutores.find(t=>t.id===b.tutor);
-        const a=t?t.animais.find(an=>an.id===b.animal):null;
-        const nomeCliente=a?a.nome:'';
-        let txt=b.tipo==='pacote'?`Banho ${b.ordem}/${b.total} - ${nomeCliente}`:`${nomeCliente} - R$${b.valor}`;
-        if(b.tipo==='pacote' && b.ordem===1) txt+=` - Pago`;
-        const btn=document.createElement('button'); btn.className='badge '+b.tipo; btn.textContent=txt;
-        diaDiv.appendChild(btn);
-      });
-    }
-    mesDiv.appendChild(diasContainer);
-    container.appendChild(mesDiv);
-  });
-}
-
-function togglePacoteOptions(){document.getElementById('pacoteOptions').style.display=document.getElementById('tipoBanho').value==='pacote'?'block':'none';}
-
-/* Inicialização */
-mostrarAgenda();
-</script>
-
-</body>
-</html>
+ 
