@@ -5,377 +5,541 @@
 <title>Estética Animal — Agenda & Tutores</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- Bootstrap 5 -->
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Font Awesome (ícones lápis/lixeira) -->
+<!-- Ícones -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-:root{
-  --rosa:#ff66a3;
-  --rosa-escuro:#ff3385;
-  --bg:#fff0f6;
-  --card:#ffffff;
-  --texto:#444;
-  --sombra:0 4px 8px rgba(255,102,163,.15);
-  --azul:#0d6efd;
-  --verde:#198754;
-}
-body{background:var(--bg); color:var(--texto);}
-.navbar-brand img{width:36px; height:36px; border-radius:50%; object-fit:cover; margin-right:.5rem;}
-.card{box-shadow:var(--sombra); border:0; border-radius:1rem;}
-.btn-rounded{border-radius:.75rem;}
-/* ======= AGENDA (calendário) ======= */
-#calendario{max-height:75vh; overflow-y:auto;}
-.mes{background:var(--card); border-radius:1rem; padding:12px; margin-bottom:20px; box-shadow:var(--sombra);}
-.mes h2{margin:6px 0 12px; text-transform:capitalize; color:var(--rosa-escuro); text-align:center; font-size:1.1rem}
-.dias-semana{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; text-align:center; font-weight:600; font-size:.85rem;}
-.dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
-.dia{background:#ffe6f0; border-radius:.75rem; min-height:92px; padding:6px; position:relative; font-size:.85rem;}
-.dia-num{font-weight:700; opacity:.9}
-.dia.hoje{outline:2px solid var(--rosa-escuro); background:#ffd1e3}
-.badge-appt{display:block; width:100%; text-align:left; border:none; border-radius:.6rem; color:#fff; padding:6px 8px; margin-top:6px; cursor:pointer; font-size:.8rem; line-height:1.2; box-shadow:0 2px 6px rgba(0,0,0,.08);}
-.badge-appt.avulso{background:var(--azul)}
-.badge-appt.pacote{background:var(--verde)}
-/* Login overlay */
-#loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.98); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000; padding:1rem;}
-#loginScreen .card{max-width:380px; width:100%;}
-#logoLogin{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto .5rem auto;display:block;}
-/* Modal ajuste */
-#modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
-#modal{background:#fff; width:95%; max-width:480px; border-radius:1rem; box-shadow:var(--sombra); padding:16px;}
-#modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
-.small-muted{font-size:.85rem; opacity:.85; margin-top:-4px; text-align:center;}
-/* Responsivo: empilha no mobile */
-@media (max-width: 991px){
-  #agendaMain{flex-direction:column;}
-}
+  :root{
+    --rosa:#ff66a3;
+    --rosa-escuro:#ff3385;
+    --bg:#fff0f6;
+    --card:#ffffff;
+    --texto:#444;
+    --sombra:0 4px 8px rgba(255,102,163,.3);
+    --azul:#0d6efd;
+    --verde:#198754;
+  }
+  body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto);}
+  header{background:var(--rosa); color:#fff; box-shadow:var(--sombra);}
+  header h1{font-size:20px; display:flex; align-items:center; gap:10px; margin:0;}
+  #logoHeader{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+
+  .mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra);}
+  .mes h2{margin:6px 0 12px; text-transform:capitalize; color:var(--rosa-escuro); text-align:center}
+  .dias-semana{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; text-align:center; font-weight:bold; font-size:12px;}
+  .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .dia{background:#ffe6f0; border-radius:8px; min-height:86px; padding:6px; font-size:12px;}
+  .dia-num{font-weight:bold; opacity:.8}
+  .dia.hoje{outline:2px solid var(--rosa-escuro); background:#ffd1e3}
+  .badge-ag{display:block; width:100%; text-align:left; border:none; border-radius:8px; color:#fff; padding:6px 8px; margin-top:6px; cursor:pointer; font-size:12px;}
+  .badge-ag.avulso{background:var(--azul)}
+  .badge-ag.pacote{background:var(--verde)}
+
+  /* Login */
+  #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.96); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
+  #loginScreen h2{margin-bottom:20px; color:var(--rosa-escuro);}
+  #loginScreen input{width:220px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
+  #loginScreen button{width:100%; max-width:240px; padding:10px; margin-top:12px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
+  #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+
+  /* Modal simples */
+  #modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
+  #modal{background:#fff; width:95%; max-width:460px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+  #modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
+  .modal-row{display:flex; gap:10px; margin:8px 0;}
+  .modal-row > *{flex:1;}
+  .modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
+
+  /* Responsivo: celular = calendário compacto e sidebar abaixo */
+  @media (max-width: 768px){
+    .dia{min-height:64px; padding:4px; font-size:11px;}
+    .dias{gap:4px;}
+    .dias-semana{font-size:11px;}
+    .mes h2{font-size:16px;}
+  }
 </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background:var(--rosa);">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="#">
-      <img src="logo.png" alt="Logo">Estética Animal
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="topNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a id="navAgenda" class="nav-link active" href="#" onclick="mostrarAgenda(event)">Agenda</a></li>
-        <li class="nav-item"><a id="navTutores" class="nav-link" href="#" onclick="mostrarTutores(event)">Controle de Tutores</a></li>
-      </ul>
-      <div class="d-flex">
-        <button id="btnLogout" class="btn btn-light btn-sm btn-rounded d-none" onclick="doLogout()">Sair</button>
-      </div>
-    </div>
-  </div>
-</nav>
-
 <!-- Login -->
 <div id="loginScreen">
-  <div class="card p-3 p-md-4">
-    <img src="logo.png" id="logoLogin" alt="Logo">
-    <h4 class="text-center mb-3" style="color:var(--rosa-escuro)">Login Estética Animal</h4>
-    <div class="mb-2">
-      <label class="form-label">Email</label>
-      <input type="email" id="loginUser" class="form-control" placeholder="email@exemplo.com" />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Senha</label>
-      <input type="password" id="loginPass" class="form-control" placeholder="••••••••" />
-    </div>
-    <button class="btn btn-primary w-100 btn-rounded" onclick="fazerLogin()">Entrar</button>
-  </div>
+  <img src="logo.png" alt="Logo" id="logoLogin">
+  <h2>Login Estética Animal</h2>
+  <input type="text" id="loginUser" placeholder="Usuário" />
+  <input type="password" id="loginPass" placeholder="Senha" />
+  <button onclick="fazerLogin()">Entrar</button>
 </div>
 
-<!-- Conteúdo -->
-<div class="container-fluid py-3 py-lg-4">
+<!-- Navbar -->
+<header class="py-2">
+  <div class="container d-flex justify-content-between align-items-center">
+    <h1><img src="logo.png" alt="Logo" id="logoHeader"> Estética Animal</h1>
+    <nav class="d-flex gap-2">
+      <a href="#" id="navAgenda" class="btn btn-sm btn-light" onclick="mostrarAgenda(event)">Agenda</a>
+      <a href="#" id="navTutores" class="btn btn-sm btn-light" onclick="mostrarTutores(event)">Controle de Tutores</a>
+    </nav>
+  </div>
+</header>
 
+<main class="container my-4">
   <!-- ======= AGENDA ======= -->
-  <section id="agendaMain" class="row g-3">
-    <div class="col-12 col-lg-8">
-      <div class="card p-3">
-        <h5 class="mb-3">Calendário</h5>
-        <div id="calendario"></div>
-      </div>
-    </div>
-    <aside class="col-12 col-lg-4">
-      <div class="card p-3">
-        <h5 class="text-center mb-3" style="color:var(--rosa-escuro)">Adicionar Banho</h5>
+  <section id="agendaMain" class="row">
+    <div class="col-lg-8" id="calendario"></div>
+    <aside class="col-lg-4 mt-3 mt-lg-0">
+      <div class="card shadow-sm p-3">
+        <h3 class="text-center text-primary">Adicionar Banho</h3>
         <div class="mb-2">
-          <label class="form-label">Tipo</label>
+          <label>Tipo</label>
           <select id="tipoBanho" class="form-select" onchange="togglePacoteOptions()">
             <option value="avulso">Avulso</option>
             <option value="pacote">Pacote</option>
           </select>
         </div>
         <div class="mb-2" id="pacoteOptions" style="display:none">
-          <label class="form-label">Pacote</label>
+          <label>Pacote</label>
           <select id="pacoteSelecionado" class="form-select">
-            <option value="3">Pacote 3 banhos (1x por semana / 3 semanas)</option>
-            <option value="4">Pacote 4 banhos (1x por semana / 4 semanas)</option>
+            <option value="3">Pacote 3 banhos (1/semana)</option>
+            <option value="4">Pacote 4 banhos (1/semana)</option>
           </select>
         </div>
         <div class="mb-2">
-          <label for="tutorSelect" class="form-label">Tutor</label>
+          <label>Tutor</label>
           <select id="tutorSelect" class="form-select" onchange="carregarAnimais()">
             <option value="">Selecione um tutor</option>
           </select>
         </div>
         <div class="mb-2">
-          <label for="animalSelect" class="form-label">Cliente</label>
+          <label>Cliente</label>
           <select id="animalSelect" class="form-select">
             <option value="">Selecione um cliente</option>
           </select>
         </div>
-        <div class="mb-2">
-          <label class="form-label" for="dataBanho">Data</label>
-          <input type="date" id="dataBanho" class="form-control" />
-        </div>
-        <div class="mb-2">
-          <label class="form-label" for="horario">Horário</label>
-          <input type="time" id="horario" class="form-control" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label" for="valor">Valor (opcional)</label>
-          <input type="number" id="valor" class="form-control" step="0.01" min="0" />
-        </div>
-        <button class="btn btn-primary w-100 btn-rounded" onclick="adicionarBanho()">Adicionar</button>
+        <div class="mb-2"><label>Data</label><input type="date" id="dataBanho" class="form-control"/></div>
+        <div class="mb-2"><label>Horário</label><input type="time" id="horario" class="form-control"/></div>
+        <div class="mb-3"><label>Valor (opcional)</label><input type="number" id="valor" class="form-control" step="0.01" min="0"/></div>
+        <button class="btn btn-primary w-100" onclick="adicionarBanho()">Adicionar</button>
       </div>
     </aside>
   </section>
 
-  <!-- ======= CONTROLE DE TUTORES ======= -->
-  <section id="tutoresSec" class="row g-3" style="display:none;">
-    <div class="col-12 col-lg-4">
-      <div class="card p-3">
-        <h5 class="mb-3">Cadastrar Tutor</h5>
-        <div class="mb-2"><input type="text" id="tutorNome" class="form-control" placeholder="Nome completo" /></div>
-        <div class="mb-2"><input type="text" id="tutorEndereco" class="form-control" placeholder="Endereço" /></div>
-        <div class="mb-3"><input type="text" id="tutorTelefone" class="form-control" placeholder="Telefone" /></div>
-        <button class="btn btn-primary w-100 btn-rounded" onclick="adicionarTutor()">Salvar Tutor</button>
-      </div>
-      <div class="card p-3 mt-3">
-        <h5 class="mb-3">Adicionar Cliente</h5>
-        <div class="mb-2">
-          <select id="animalTutor" class="form-select"></select>
+  <!-- ======= TUTORES ======= -->
+  <section id="tutoresSec" style="display:none">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+          <h3>Cadastrar Tutor</h3>
+          <input type="text" id="tutorNome" class="form-control mb-2" placeholder="Nome completo">
+          <input type="text" id="tutorEndereco" class="form-control mb-2" placeholder="Endereço">
+          <input type="text" id="tutorTelefone" class="form-control mb-2" placeholder="Telefone">
+          <button class="btn btn-success w-100" onclick="adicionarTutor()">Salvar Tutor</button>
         </div>
-        <div class="mb-2"><input type="text" id="animalNome" class="form-control" placeholder="Nome do Cliente" /></div>
-        <div class="mb-3"><input type="file" id="animalFoto" class="form-control" accept="image/*" /></div>
-        <button class="btn btn-primary w-100 btn-rounded" onclick="adicionarAnimal()">Salvar Cliente</button>
       </div>
-    </div>
-    <div class="col-12 col-lg-8">
-      <div class="card p-3">
-        <h5 class="mb-3">Tutores Registrados</h5>
-        <div id="tutoresContainer" class="list-group"></div>
+      <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+          <h3>Adicionar Cliente</h3>
+          <select id="animalTutor" class="form-select mb-2"></select>
+          <input type="text" id="animalNome" class="form-control mb-2" placeholder="Nome do Cliente">
+          <input type="file" id="animalFoto" class="form-control mb-2" accept="image/*">
+          <button class="btn btn-info w-100" onclick="adicionarAnimal()">Salvar Cliente</button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3 shadow-sm">
+          <h3>Tutores Registrados</h3>
+          <div id="tutoresContainer"></div>
+        </div>
       </div>
     </div>
   </section>
-</div>
+</main>
 
-<!-- ======= MODAL EDIÇÃO (custom) ======= -->
+<!-- ======= MODAL EDIÇÃO ======= -->
 <div id="modalOverlay">
   <div id="modal">
     <h3>Gerenciar Agendamento</h3>
-    <div class="small-muted" id="modalInfo"></div>
-    <div class="row g-2 my-2">
-      <div class="col-6">
-        <label class="form-label">Horário</label>
+    <div class="small text-center mb-2" id="modalInfo"></div>
+    <div class="modal-row">
+      <div>
+        <label>Horário</label>
         <input type="time" id="modalHorario" class="form-control">
       </div>
-      <div class="col-6">
-        <label class="form-label">Aplicar ao pacote?</label>
+      <div>
+        <label>Aplicar ao pacote?</label>
         <select id="modalAplicarPacote" class="form-select">
           <option value="nao">Não</option>
           <option value="sim">Sim</option>
         </select>
       </div>
     </div>
-    <div class="d-grid gap-2 mt-2">
-      <button class="btn btn-primary btn-rounded" onclick="salvarEdicaoBanho()">Salvar alterações</button>
-      <button class="btn btn-danger btn-rounded" onclick="excluirEsteBanho()">Excluir apenas este</button>
-      <button class="btn btn-danger btn-rounded" id="btnExcluirPacote" style="display:none" onclick="excluirPacote()">Excluir pacote inteiro</button>
-      <button class="btn btn-secondary btn-rounded" onclick="fecharModal()">Cancelar</button>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="salvarEdicaoBanho()">Salvar alterações</button>
+      <button class="btn btn-danger" onclick="excluirEsteBanho()">Excluir apenas este</button>
+      <button class="btn btn-danger" id="btnExcluirPacote" style="display:none" onclick="excluirPacote()">Excluir pacote inteiro</button>
+      <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- Firebase SDKs (modular, via CDN) -->
+<!-- ==================== APP (Módulo) ==================== -->
 <script type="module">
-/* ==================== Firebase ==================== */
+/* ========= Firebase ========= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, getDoc, setDoc, doc, updateDoc, deleteDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore, collection, doc, getDocs, getDoc, setDoc, addDoc, deleteDoc, query, where
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* ===== SUA CONFIG FIREBASE (use a sua) ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyCcZ-Gt1XqLxRLYI1CnwsqG_2gdyDyHhyI",
   authDomain: "estetica-animal.firebaseapp.com",
-  databaseURL: "https://estetica-animal-default-rtdb.firebaseio.com",
   projectId: "estetica-animal",
-  storageBucket: "estetica-animal.firebasestorage.app",
+  storageBucket: "estetica-animal.appspot.com",
   messagingSenderId: "634118247526",
   appId: "1:634118247526:web:1255d3c25f660f66b589a7"
 };
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
+const db  = getFirestore(app);
 
-/* ==================== UTIL / HELPERS ==================== */
-const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+/* ========= Utils ========= */
 const pad2 = n => String(n).padStart(2,'0');
-const toYMD = (y,m,d) => `${y}-${pad2(m)}-${pad2(d)}`; // SEM fuso
+const toYMD = (y,m,d) => `${y}-${pad2(m)}-${pad2(d)}`;
 function addDaysYMD(ymd, days){
   const [Y,M,D]=ymd.split('-').map(Number);
-  const dt=new Date(Y, M-1, D+days); // local
+  const dt=new Date(Y, M-1, D+days); // local (sem UTC) => evita “dia anterior”
   return toYMD(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
 }
-function setAtivo(id){
-  document.querySelectorAll('.navbar .nav-link').forEach(a=>a.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+const uidLocal = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
-/* ==================== ESTADO EM MEMÓRIA ==================== */
-let tutorsCache = [];        // [{id, nome, endereco, tel}]
-let animalsCache = new Map();// animalId -> {id, nome, tutorId, foto?}
-let banhosCache = [];        // [{id, ...}]
+/* ========= Estado / Cache ========= */
+let cacheTutores = [];           // [{id, nome, endereco, tel}]
+let cacheAnimaisPorTutor = {};   // { [tutorId]: [{id, nome, foto}] }
+let mapAnimalNome = new Map();   // animalId -> nome
+let modalBanhoId = null;
 
-/* ==================== AUTH ==================== */
-async function fazerLogin(){
-  const email = document.getElementById('loginUser').value.trim();
-  const pass  = document.getElementById('loginPass').value.trim();
-  if(!email || !pass){ alert('Informe email e senha.'); return; }
-  try{
-    await signInWithEmailAndPassword(auth, email, pass);
-  }catch(err){
-    console.error(err);
-    alert('Falha no login: '+ (err?.message || 'verifique seus dados'));
-  }
-}
-function doLogout(){ signOut(auth); }
-
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
+/* ========= Login ========= */
+const usuarios = [
+  { user: 'kamilly', pass: 'petshop2025' },
+  { user: 'leocir',  pass: 'admin' }
+];
+window.fazerLogin = function(){
+  const u=document.getElementById('loginUser').value.trim().toLowerCase();
+  const p=document.getElementById('loginPass').value.trim();
+  const ok=usuarios.find(x=>x.user===u && x.pass===p);
+  if(ok){
     document.getElementById('loginScreen').style.display='none';
-    document.getElementById('btnLogout').classList.remove('d-none');
-    await carregarTudo();
     mostrarAgenda();
-  }else{
-    document.getElementById('btnLogout').classList.add('d-none');
-    document.getElementById('loginScreen').style.display='flex';
+    carregarTudo(); // carrega tutores/animais e agenda
+  } else {
+    alert('Usuário ou senha incorretos');
   }
-});
+};
 
-/* ==================== FIRESTORE LOAD ==================== */
-async function carregarTudo(){
-  await carregarTutoresEAnimais();
-  await carregarBanhos();
-  atualizarTutoresSelect(); // usa tutorsCache
-  renderTutores();          // usa tutors + animals
-  renderCalendario();       // usa banhos + animals
-}
-async function carregarTutoresEAnimais(){
-  tutorsCache = [];
-  animalsCache = new Map();
-  const snapT = await getDocs(collection(db,'tutores'));
-  for(const docT of snapT.docs){
-    const t = { id: docT.id, ...docT.data() };
-    tutorsCache.push(t);
-    // subcoleção animais
-    const subSnap = await getDocs(collection(db,'tutores', t.id, 'animais'));
-    for(const aDoc of subSnap.docs){
-      const a = { id: aDoc.id, ...aDoc.data(), tutorId: t.id };
-      animalsCache.set(a.id, a);
-    }
-  }
-}
-async function carregarBanhos(){
-  banhosCache = [];
-  // pode filtrar/ordenar por data
-  const qSnap = await getDocs(collection(db,'banhos'));
-  for(const d of qSnap.docs){
-    banhosCache.push({ id:d.id, ...d.data() });
-  }
-}
-
-/* ==================== NAV ==================== */
-function mostrarAgenda(e){ if(e) e.preventDefault();
+/* ========= Navegação ========= */
+window.setAtivo = function(id){
+  document.querySelectorAll('header nav a').forEach(a=>a.classList.remove('btn-dark'));
+  document.getElementById(id).classList.add('btn-dark');
+};
+window.mostrarAgenda = function(e){
+  if(e) e.preventDefault();
   document.getElementById('agendaMain').style.display='flex';
   document.getElementById('tutoresSec').style.display='none';
   setAtivo('navAgenda');
   renderCalendario();
-}
-function mostrarTutores(e){ if(e) e.preventDefault();
+};
+window.mostrarTutores = function(e){
+  if(e) e.preventDefault();
   document.getElementById('agendaMain').style.display='none';
   document.getElementById('tutoresSec').style.display='block';
   setAtivo('navTutores');
-  renderTutores();
+  renderTutoresUI();
+};
+
+/* ========= Firestore: Tutores & Animais ========= */
+async function carregarTutoresEAnimais(){
+  cacheTutores = [];
+  cacheAnimaisPorTutor = {};
+  mapAnimalNome.clear();
+
+  const snapT = await getDocs(collection(db,'tutores'));
+  snapT.forEach(docu=>{
+    cacheTutores.push({ id:docu.id, ...docu.data() });
+  });
+  // ordena por nome
+  cacheTutores.sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
+
+  // carrega subcoleções de animais
+  for(const t of cacheTutores){
+    const subSnap = await getDocs(collection(db,'tutores', t.id, 'animais'));
+    cacheAnimaisPorTutor[t.id] = [];
+    subSnap.forEach(d=>{
+      const animal = { id:d.id, ...d.data() };
+      cacheAnimaisPorTutor[t.id].push(animal);
+      mapAnimalNome.set(animal.id, animal.nome || 'Cliente');
+    });
+    cacheAnimaisPorTutor[t.id].sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
+  }
 }
 
-/* ==================== CALENDÁRIO (2 meses, Seg→Dom) ==================== */
-function renderCalendario(){
-  const cal = document.getElementById('calendario');
-  cal.innerHTML = '';
+function renderTutoresUI(){
+  // Preenche selects
+  const selTutor = document.getElementById('tutorSelect');
+  const selTutorAnimal = document.getElementById('animalTutor');
+  selTutor.innerHTML = '<option value="">Selecione um tutor</option>';
+  selTutorAnimal.innerHTML = '<option value="">Selecione um Tutor</option>';
+  cacheTutores.forEach(t=>{
+    selTutor.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
+    selTutorAnimal.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
+  });
 
-  const hoje = new Date();
-  const baseAno = hoje.getFullYear();
-  const baseMes = hoje.getMonth(); // 0..11
+  // Lista lateral
+  const container = document.getElementById('tutoresContainer');
+  container.innerHTML = '';
+  cacheTutores.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'border-bottom pb-2 mb-2';
+    card.innerHTML = `<strong>${t.nome||'-'}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
 
-  // Indexa banhos por data (YYYY-MM-DD)
-  const porData = new Map();
-  for(const b of banhosCache){
-    const key = b.data; // já é string YYYY-MM-DD
-    if(!porData.has(key)) porData.set(key, []);
-    porData.get(key).push(b);
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn btn-sm btn-outline-danger ms-2';
+    btnDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
+    btnDel.onclick = ()=> excluirTutor(t.id);
+
+    card.appendChild(btnDel);
+
+    (cacheAnimaisPorTutor[t.id]||[]).forEach(a=>{
+      const row = document.createElement('div');
+      row.className='d-flex align-items-center justify-content-between mt-2';
+      row.innerHTML = `<div class="d-flex align-items-center gap-2">
+        ${a.foto?`<img src="${a.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`:''}
+        <span>${a.nome}</span>
+      </div>`;
+      const btnDelA = document.createElement('button');
+      btnDelA.className='btn btn-sm btn-outline-danger';
+      btnDelA.innerHTML='<i class="fa-solid fa-trash"></i>';
+      btnDelA.onclick=()=> excluirAnimal(t.id, a.id);
+      row.appendChild(btnDelA);
+      card.appendChild(row);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+window.adicionarTutor = async function(){
+  const nome=document.getElementById('tutorNome').value.trim();
+  const endereco=document.getElementById('tutorEndereco').value.trim();
+  const tel=document.getElementById('tutorTelefone').value.trim();
+  if(!nome) return alert('Informe o nome do tutor.');
+  await addDoc(collection(db,'tutores'), {nome, endereco, tel});
+  document.getElementById('tutorNome').value='';
+  document.getElementById('tutorEndereco').value='';
+  document.getElementById('tutorTelefone').value='';
+  await carregarTutoresEAnimais();
+  renderTutoresUI();
+  carregarAnimais(); // atualiza select da agenda
+};
+
+window.adicionarAnimal = async function(){
+  const tutorId=document.getElementById('animalTutor').value;
+  const nome=document.getElementById('animalNome').value.trim();
+  const file=document.getElementById('animalFoto').files[0];
+  if(!tutorId) return alert('Selecione um tutor');
+  if(!nome) return alert('Informe o nome do cliente');
+
+  let fotoData = '';
+  if(file){
+    fotoData = await new Promise((resolve)=>{
+      const r=new FileReader();
+      r.onload = e=> resolve(e.target.result);
+      r.readAsDataURL(file);
+    });
+  }
+  await addDoc(collection(db,'tutores', tutorId, 'animais'), {nome, foto: fotoData});
+  document.getElementById('animalNome').value='';
+  document.getElementById('animalFoto').value='';
+  await carregarTutoresEAnimais();
+  renderTutoresUI();
+  carregarAnimais(); // atualiza select da agenda
+};
+
+async function excluirTutor(tutorId){
+  if(!confirm('Excluir este tutor e todos os clientes vinculados?')) return;
+  // apaga subcoleção de animais
+  const snapAnim = await getDocs(collection(db,'tutores', tutorId, 'animais'));
+  for(const a of snapAnim.docs){
+    await deleteDoc(doc(db,'tutores', tutorId, 'animais', a.id));
+  }
+  // apaga o tutor
+  await deleteDoc(doc(db,'tutores', tutorId));
+  // apaga banhos vinculados ao tutor
+  const snapBanhos = await getDocs(collection(db,'banhos'));
+  for(const b of snapBanhos.docs){
+    if(b.data().tutorId === tutorId){
+      await deleteDoc(doc(db,'banhos', b.id));
+    }
+  }
+  await carregarTutoresEAnimais();
+  renderTutoresUI();
+  renderCalendario();
+}
+
+async function excluirAnimal(tutorId, animalId){
+  if(!confirm('Excluir este cliente?')) return;
+  await deleteDoc(doc(db,'tutores', tutorId, 'animais', animalId));
+  // remove banhos deste animal
+  const snapBanhos = await getDocs(collection(db,'banhos'));
+  for(const b of snapBanhos.docs){
+    if(b.data().animalId === animalId){
+      await deleteDoc(doc(db,'banhos', b.id));
+    }
+  }
+  await carregarTutoresEAnimais();
+  renderTutoresUI();
+  carregarAnimais();
+  renderCalendario();
+}
+
+window.carregarAnimais = function(){
+  const tutorId=document.getElementById('tutorSelect').value;
+  const sel=document.getElementById('animalSelect');
+  sel.innerHTML='<option value="">Selecione um cliente</option>';
+  (cacheAnimaisPorTutor[tutorId]||[]).forEach(a=>{
+    sel.innerHTML += `<option value="${a.id}">${a.nome}</option>`;
+  });
+};
+
+/* ========= Firestore: Banhos / Agenda ========= */
+function getAnimalNome(animalId){
+  return mapAnimalNome.get(animalId) || 'Cliente';
+}
+
+window.togglePacoteOptions = function(){
+  const tipo=document.getElementById('tipoBanho').value;
+  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
+};
+
+window.adicionarBanho = async function(){
+  const tipo=document.getElementById('tipoBanho').value;
+  const tutorId=document.getElementById('tutorSelect').value;
+  const animalId=document.getElementById('animalSelect').value;
+  const data=document.getElementById('dataBanho').value; // YYYY-MM-DD (string)
+  const horario=document.getElementById('horario').value;
+  const valor=document.getElementById('valor').value || '';
+
+  if(!tutorId || !animalId || !data || !horario){
+    alert('Preencha tutor, cliente, data e horário.');
+    return;
   }
 
-  for(let offset=0; offset<2; offset++){
-    const first = new Date(baseAno, baseMes+offset, 1);
-    const ano = first.getFullYear();
-    const mes = first.getMonth(); // 0..11
-    const nomeMes = first.toLocaleString('pt-BR',{month:'long'});
-    const diasNoMes = new Date(ano, mes+1, 0).getDate();
+  const pacoteId = (tipo==='pacote') ? uidLocal() : null;
 
-    const mesDiv = document.createElement('div');
-    mesDiv.className = 'mes';
-    mesDiv.innerHTML = `
-      <h2>${nomeMes} ${ano}</h2>
+  if(tipo==='avulso'){
+    await addDoc(collection(db,'banhos'), { tipo, tutorId, animalId, data, horario, valor, pacoteId:null });
+  } else {
+    const qtd = parseInt(document.getElementById('pacoteSelecionado').value,10);
+    let atual = data;
+    for(let i=0;i<qtd;i++){
+      if(i>0) atual = addDaysYMD(atual, 7); // sempre +7d a partir da string anterior (sem UTC)
+      await addDoc(collection(db,'banhos'), { tipo, tutorId, animalId, data:atual, horario, valor, pacoteId });
+    }
+  }
+
+  // limpar e recarregar
+  document.getElementById('tipoBanho').value='avulso';
+  togglePacoteOptions();
+  document.getElementById('tutorSelect').value='';
+  carregarAnimais();
+  document.getElementById('dataBanho').value='';
+  document.getElementById('horario').value='';
+  document.getElementById('valor').value='';
+
+  await renderCalendario();
+};
+
+/* ========= Calendário ========= */
+async function listarBanhosPeriodo(startYMD, endYMD){
+  // Simples: carrega todos e filtra no cliente (evita problemas de índice)
+  const snap = await getDocs(collection(db,'banhos'));
+  const itens = [];
+  snap.forEach(d=>{
+    const b = { id:d.id, ...d.data() };
+    if(b.data >= startYMD && b.data <= endYMD){
+      itens.push(b);
+    }
+  });
+  return itens;
+}
+
+window.renderCalendario = async function(){
+  const calendario=document.getElementById('calendario');
+  calendario.innerHTML='';
+
+  const hoje=new Date();
+  const baseAno=hoje.getFullYear();
+  const baseMes=hoje.getMonth();
+
+  const mostrarMeses = window.innerWidth < 768 ? 1 : 2;
+
+  // Determina intervalo completo para buscar todos os banhos (ex: 2 meses)
+  const start = new Date(baseAno, baseMes, 1);
+  const end   = new Date(baseAno, baseMes + (mostrarMeses-1) + 1, 0); // último dia do último mês mostrado
+  const startYMD = toYMD(start.getFullYear(), start.getMonth()+1, 1);
+  const endYMD   = toYMD(end.getFullYear(),   end.getMonth()+1,   end.getDate());
+
+  const banhosPeriodo = await listarBanhosPeriodo(startYMD, endYMD);
+  // indexa por data
+  const porData = new Map();
+  for(const b of banhosPeriodo){
+    if(!porData.has(b.data)) porData.set(b.data, []);
+    porData.get(b.data).push(b);
+  }
+
+  for(let offset=0; offset<mostrarMeses; offset++){
+    const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1);
+    const ano=primeiroDiaMes.getFullYear();
+    const mes=primeiroDiaMes.getMonth();
+    const nomeMes=primeiroDiaMes.toLocaleString('pt-BR',{month:'long'});
+    const diasNoMes=new Date(ano, mes+1, 0).getDate();
+
+    const mesDiv=document.createElement('div');
+    mesDiv.className='mes';
+    mesDiv.innerHTML=`<h2>${nomeMes} ${ano}</h2>
       <div class="dias-semana">
         <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>
       </div>`;
-    const grid = document.createElement('div');
-    grid.className = 'dias';
 
-    // Segunda a Domingo: getDay() (0=Dom..6=Sáb) → índice segunda=0
-    const inicio = (new Date(ano, mes, 1).getDay() + 6) % 7;
-    for(let i=0; i<inicio; i++) grid.appendChild(document.createElement('div'));
+    const grid=document.createElement('div');
+    grid.className='dias';
+
+    // segunda→domingo (getDay 0=Dom → segunda=0)
+    const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
+    for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
     for(let d=1; d<=diasNoMes; d++){
-      const cell = document.createElement('div');
-      cell.className = 'dia';
-      if(offset===0 && d===hoje.getDate()) cell.classList.add('hoje');
-      const num = document.createElement('div');
+      const cell=document.createElement('div');
+      cell.className='dia';
+      if(offset===0 && d===hoje.getDate() && mes===hoje.getMonth() && ano===hoje.getFullYear()){
+        cell.classList.add('hoje');
+      }
+
+      const num=document.createElement('div');
       num.className='dia-num';
       num.textContent=d;
       cell.appendChild(num);
 
-      const dayStr = toYMD(ano, mes+1, d);
-      const lista = porData.get(dayStr) || [];
-      // ordena por horário
+      const dayStr=toYMD(ano, mes+1, d);
+      const lista=porData.get(dayStr)||[];
+      // ordena por horário simples (HH:MM)
       lista.sort((a,b)=> (a.horario||'').localeCompare(b.horario||''));
 
       for(const b of lista){
-        const btn = document.createElement('button');
-        btn.className = 'badge-appt ' + (b.tipo==='pacote' ? 'pacote' : 'avulso');
-        const animalNome = animalsCache.get(b.animalId)?.nome || 'Cliente';
-        btn.textContent = `${animalNome} — ${b.horario}`;
-        btn.onclick = ()=> abrirModal(b.id);
+        const btn=document.createElement('button');
+        btn.className='badge-ag '+(b.tipo==='pacote'?'pacote':'avulso');
+        btn.textContent=`${getAnimalNome(b.animalId)} — ${b.horario}`;
+        btn.onclick=()=>abrirModal(b.id);
         cell.appendChild(btn);
       }
 
@@ -383,279 +547,94 @@ function renderCalendario(){
     }
 
     mesDiv.appendChild(grid);
-    cal.appendChild(mesDiv);
+    calendario.appendChild(mesDiv);
   }
-}
+};
 
-/* ==================== TUTORES / CLIENTES ==================== */
-async function adicionarTutor(){
-  const nome = document.getElementById('tutorNome').value.trim();
-  const endereco = document.getElementById('tutorEndereco').value.trim();
-  const tel = document.getElementById('tutorTelefone').value.trim();
-  if(!nome){ alert('Informe o nome.'); return; }
-  try{
-    const ref = await addDoc(collection(db,'tutores'), { nome, endereco, tel });
-    tutorsCache.push({id:ref.id, nome, endereco, tel});
-    document.getElementById('tutorNome').value='';
-    document.getElementById('tutorEndereco').value='';
-    document.getElementById('tutorTelefone').value='';
-    atualizarTutoresSelect();
-    renderTutores();
-  }catch(e){ console.error(e); alert('Erro ao salvar tutor.'); }
-}
-
-async function adicionarAnimal(){
-  const tutorId = document.getElementById('animalTutor').value;
-  const nome = document.getElementById('animalNome').value.trim();
-  const file = document.getElementById('animalFoto').files[0];
-  if(!tutorId) return alert('Selecione um tutor');
-  if(!nome) return alert('Informe o nome do cliente');
-
-  let fotoDataUrl = '';
-  if(file){
-    fotoDataUrl = await new Promise(res=>{
-      const reader=new FileReader();
-      reader.onload=e=>res(e.target.result);
-      reader.readAsDataURL(file);
-    });
-  }
-
-  try{
-    const ref = await addDoc(collection(db,'tutores', tutorId, 'animais'), { nome, foto: fotoDataUrl });
-    const novo = { id: ref.id, nome, foto: fotoDataUrl, tutorId };
-    animalsCache.set(novo.id, novo);
-    document.getElementById('animalNome').value='';
-    document.getElementById('animalFoto').value='';
-    atualizarTutoresSelect();
-    renderTutores();
-  }catch(e){ console.error(e); alert('Erro ao salvar cliente.'); }
-}
-
-async function excluirTutor(id){
-  if(!confirm('Excluir este tutor e todos os clientes vinculados?')) return;
-  try{
-    // Apagar animais do tutor
-    const subSnap = await getDocs(collection(db,'tutores', id, 'animais'));
-    for(const aDoc of subSnap.docs){
-      await deleteDoc(doc(db,'tutores', id, 'animais', aDoc.id));
-      animalsCache.delete(aDoc.id);
-    }
-    // Apagar banhos dele
-    const toDelete = banhosCache.filter(b=>b.tutorId===id);
-    for(const b of toDelete) await deleteDoc(doc(db,'banhos', b.id));
-    banhosCache = banhosCache.filter(b=>b.tutorId!==id);
-    // Apagar o tutor
-    await deleteDoc(doc(db,'tutores', id));
-    tutorsCache = tutorsCache.filter(t=>t.id!==id);
-
-    atualizarTutoresSelect();
-    renderTutores();
-    renderCalendario();
-  }catch(e){ console.error(e); alert('Erro ao excluir tutor.'); }
-}
-
-async function excluirAnimal(tutorId, animalId){
-  if(!confirm('Excluir este cliente?')) return;
-  try{
-    await deleteDoc(doc(db,'tutores', tutorId, 'animais', animalId));
-    animalsCache.delete(animalId);
-    // remove banhos deste animal
-    const toDelete = banhosCache.filter(b=>b.animalId===animalId);
-    for(const b of toDelete) await deleteDoc(doc(db,'banhos', b.id));
-    banhosCache = banhosCache.filter(b=>b.animalId!==animalId);
-
-    atualizarTutoresSelect();
-    renderTutores();
-    renderCalendario();
-  }catch(e){ console.error(e); alert('Erro ao excluir cliente.'); }
-}
-
-function renderTutores(){
-  const container = document.getElementById('tutoresContainer');
-  const sel = document.getElementById('animalTutor');
-  container.innerHTML='';
-  sel.innerHTML='<option value="">Selecione um Tutor</option>';
-
-  tutorsCache.forEach(t=>{
-    sel.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
-
-    const item = document.createElement('div');
-    item.className = 'list-group-item';
-    item.innerHTML = `
-      <div class="d-flex w-100 justify-content-between align-items-center">
-        <h6 class="mb-1">${t.nome}</h6>
-        <div>
-          <button class="btn btn-sm btn-outline-danger btn-rounded me-1" title="Excluir tutor" onclick="excluirTutor('${t.id}')">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      </div>
-      <small class="text-muted">${t.endereco || '-'} ${t.tel ? (' • '+t.tel):''}</small>
-      <div class="mt-2" id="animais_${t.id}"></div>
-    `;
-    container.appendChild(item);
-
-    // lista animais deste tutor
-    const box = item.querySelector('#animais_'+t.id);
-    for(const a of Array.from(animalsCache.values()).filter(x=>x.tutorId===t.id)){
-      const row = document.createElement('div');
-      row.className = 'd-flex align-items-center justify-content-between py-1';
-      row.innerHTML = `
-        <div class="d-flex align-items-center gap-2">
-          ${a.foto ? `<img src="${a.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">` : ''}
-          <span>${a.nome}</span>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-danger btn-rounded" title="Excluir cliente" onclick="excluirAnimal('${t.id}','${a.id}')">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </div>
-      `;
-      box.appendChild(row);
-    }
-  });
-}
-
-function atualizarTutoresSelect(){
-  const sel = document.getElementById('tutorSelect');
-  sel.innerHTML = '<option value="">Selecione um tutor</option>';
-  tutorsCache.forEach(t=> sel.innerHTML += `<option value="${t.id}">${t.nome}</option>`);
-  carregarAnimais();
-}
-
-function carregarAnimais(){
-  const tutorId = document.getElementById('tutorSelect').value;
-  const sel = document.getElementById('animalSelect');
-  sel.innerHTML = '<option value="">Selecione um cliente</option>';
-  Array.from(animalsCache.values())
-    .filter(a=>!tutorId || a.tutorId===tutorId)
-    .forEach(a=> sel.innerHTML += `<option value="${a.id}">${a.nome}</option>`);
-}
-
-/* ==================== BANHOS ==================== */
-function togglePacoteOptions(){
-  const tipo = document.getElementById('tipoBanho').value;
-  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
-}
-
-async function adicionarBanho(){
-  const tipo     = document.getElementById('tipoBanho').value;
-  const tutorId  = document.getElementById('tutorSelect').value;
-  const animalId = document.getElementById('animalSelect').value;
-  const data     = document.getElementById('dataBanho').value; // YYYY-MM-DD (string)
-  const horario  = document.getElementById('horario').value;
-  const valor    = document.getElementById('valor').value || '';
-
-  if(!tutorId || !animalId || !data || !horario){
-    alert('Preencha tutor, cliente, data e horário.');
-    return;
-  }
-
-  const pacoteId = (tipo==='pacote') ? uid() : null;
-  const base = { tipo, tutorId, animalId, horario, valor, pacoteId };
-
-  try{
-    if(tipo==='avulso'){
-      // salva exatamente a mesma data digitada (string local)
-      await addDoc(collection(db,'banhos'), { ...base, data });
-      banhosCache.push({ id:'', ...base, data }); // push local (id será atualizado ao recarregar)
-    }else{
-      const qtd = parseInt(document.getElementById('pacoteSelecionado').value,10);
-      let atual = data;
-      for(let i=0;i<qtd;i++){
-        if(i>0) atual = addDaysYMD(atual, 7); // +7 dias sem cair em UTC
-        await addDoc(collection(db,'banhos'), { ...base, data: atual });
-        banhosCache.push({ id:'', ...base, data: atual });
-      }
-    }
-    await carregarBanhos(); // para trazer os IDs reais e sincronizar
-    renderCalendario();
-
-    // limpa
-    document.getElementById('tipoBanho').value='avulso';
-    togglePacoteOptions();
-    document.getElementById('tutorSelect').value='';
-    carregarAnimais();
-    document.getElementById('dataBanho').value='';
-    document.getElementById('horario').value='';
-    document.getElementById('valor').value='';
-  }catch(e){ console.error(e); alert('Erro ao adicionar banho.'); }
-}
-
-/* ==================== MODAL editar/excluir ==================== */
-let modalBanhoId = null;
-function abrirModal(banhoId){
+/* ========= Modal: editar / excluir ========= */
+window.abrirModal = async function(banhoId){
   modalBanhoId = banhoId;
-  const b = banhosCache.find(x=>x.id===banhoId);
-  if(!b) return;
-
-  const nome = animalsCache.get(b.animalId)?.nome || 'Cliente';
-  document.getElementById('modalInfo').textContent = `${nome} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
+  const bDoc = await getDoc(doc(db,'banhos', banhoId));
+  if(!bDoc.exists()) return;
+  const b = bDoc.data();
+  document.getElementById('modalInfo').textContent =
+    `${getAnimalNome(b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
   document.getElementById('modalHorario').value = b.horario || '';
-  document.getElementById('modalAplicarPacote').value = 'nao';
-  document.getElementById('btnExcluirPacote').style.display = b.pacoteId ? 'block':'none';
-
+  document.getElementById('modalAplicarPacote').value='nao';
+  document.getElementById('btnExcluirPacote').style.display = b.pacoteId ? 'block' : 'none';
   document.getElementById('modalOverlay').style.display='flex';
-}
-function fecharModal(){
+};
+window.fecharModal = function(){
   document.getElementById('modalOverlay').style.display='none';
   modalBanhoId = null;
-}
-async function salvarEdicaoBanho(){
-  const novoHorario = document.getElementById('modalHorario').value;
-  const aplicarPacote = document.getElementById('modalAplicarPacote').value==='sim';
+};
+window.salvarEdicaoBanho = async function(){
+  const novoHorario = (document.getElementById('modalHorario').value || '').trim();
+  const aplicar     = document.getElementById('modalAplicarPacote').value === 'sim';
   if(!modalBanhoId || !novoHorario) return;
 
-  try{
-    const alvo = banhosCache.find(x=>x.id===modalBanhoId);
-    if(!alvo) return;
+  const alvoDoc = await getDoc(doc(db,'banhos', modalBanhoId));
+  if(!alvoDoc.exists()) return;
+  const alvo = alvoDoc.data();
 
-    if(aplicarPacote && alvo.pacoteId){
-      // atualiza todos do pacote
-      const doPac = banhosCache.filter(x=>x.pacoteId===alvo.pacoteId);
-      for(const b of doPac){
-        await updateDoc(doc(db,'banhos', b.id), { horario: novoHorario });
-        b.horario = novoHorario;
+  if(aplicar && alvo.pacoteId){
+    // aplica em todos do pacote
+    const snap = await getDocs(collection(db,'banhos'));
+    const ops = [];
+    for(const d of snap.docs){
+      const x = d.data();
+      if(x.pacoteId === alvo.pacoteId){
+        ops.push(setDoc(doc(db,'banhos', d.id), {...x, horario: novoHorario}));
       }
-    }else{
-      await updateDoc(doc(db,'banhos', alvo.id), { horario: novoHorario });
-      alvo.horario = novoHorario;
     }
-    fecharModal();
-    renderCalendario();
-  }catch(e){ console.error(e); alert('Erro ao salvar mudanças.'); }
-}
-async function excluirEsteBanho(){
+    await Promise.all(ops);
+  } else {
+    await setDoc(doc(db,'banhos', modalBanhoId), {...alvo, horario: novoHorario});
+  }
+  fecharModal();
+  await renderCalendario();
+};
+window.excluirEsteBanho = async function(){
   if(!modalBanhoId) return;
   if(!confirm('Deseja excluir apenas este banho?')) return;
-  try{
-    await deleteDoc(doc(db,'banhos', modalBanhoId));
-    banhosCache = banhosCache.filter(x=>x.id!==modalBanhoId);
-    fecharModal();
-    renderCalendario();
-  }catch(e){ console.error(e); alert('Erro ao excluir banho.'); }
-}
-async function excluirPacote(){
+  await deleteDoc(doc(db,'banhos', modalBanhoId));
+  fecharModal();
+  await renderCalendario();
+};
+window.excluirPacote = async function(){
   if(!modalBanhoId) return;
-  const alvo = banhosCache.find(x=>x.id===modalBanhoId);
-  if(!alvo?.pacoteId) return;
+  const alvoDoc = await getDoc(doc(db,'banhos', modalBanhoId));
+  if(!alvoDoc.exists()) return;
+  const alvo = alvoDoc.data();
+  if(!alvo.pacoteId) return;
   if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
-  try{
-    const doPac = banhosCache.filter(x=>x.pacoteId===alvo.pacoteId);
-    for(const b of doPac) await deleteDoc(doc(db,'banhos', b.id));
-    banhosCache = banhosCache.filter(x=>x.pacoteId!==alvo.pacoteId);
-    fecharModal();
-    renderCalendario();
-  }catch(e){ console.error(e); alert('Erro ao excluir pacote.'); }
+
+  const snap = await getDocs(collection(db,'banhos'));
+  const ops = [];
+  for(const d of snap.docs){
+    const x = d.data();
+    if(x.pacoteId === alvo.pacoteId){
+      ops.push(deleteDoc(doc(db,'banhos', d.id)));
+    }
+  }
+  await Promise.all(ops);
+  fecharModal();
+  await renderCalendario();
+};
+
+/* ========= Carregamento inicial ========= */
+async function carregarTudo(){
+  await carregarTutoresEAnimais();
+  renderTutoresUI();
+  carregarAnimais();
+  await renderCalendario();
 }
 
-/* ==================== INICIALIZAÇÃO ==================== */
-window.addEventListener('DOMContentLoaded', ()=>{
+// Render inicial básico (antes do login só monta estrutura visual)
+document.addEventListener('DOMContentLoaded', ()=>{
   togglePacoteOptions();
+  renderCalendario();
 });
 </script>
-
-<!-- Bootstrap JS (para navbar colapsar etc.) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
