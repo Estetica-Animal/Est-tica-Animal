@@ -218,6 +218,7 @@ const usuarios = [
   { user: 'kamilly', pass: 'petshop2025' },
   { user: 'leocir', pass: 'admin' }
 ];
+
 function fazerLogin(){
   const u=document.getElementById('loginUser').value.trim().toLowerCase();
   const p=document.getElementById('loginPass').value.trim();
@@ -227,10 +228,11 @@ function fazerLogin(){
     mostrarAgenda();
     document.getElementById('loginUser').value='';
     document.getElementById('loginPass').value='';
-  }else{
+  } else {
     alert('Usuário ou senha incorretos');
   }
 }
+
 
 /* ==================== NAV ==================== */
 function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));document.getElementById(id).classList.add('ativo');}
@@ -559,3 +561,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
