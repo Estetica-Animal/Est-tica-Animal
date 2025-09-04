@@ -342,25 +342,120 @@ function adicionarBanho(){
   const data=document.getElementById('dataBanho').value;
   const horario=document.getElementById('horario').value;
   const valor=document.getElementById('valor').value;
+
   if(!tutorId||!animalId||!data||!horario) return alert('Preencha todos os campos');
+
   const banhos=load(LS_BANHOS);
+  const pacoteId = uid();
+
   if(tipo==='avulso'){
-    banhos.push({id:uid(),tipo,tutorId,animalId,data,horario,valor});
+    banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data,horario,valor});
   } else {
     const qtd=parseInt(document.getElementById('pacoteSelecionado').value);
-    const inicio=new Date(data);
+    let dt=new Date(data+"T00:00"); // força meia-noite local
     for(let i=0;i<qtd;i++){
-      const dt=new Date(inicio); dt.setDate(dt.getDate()+7*i);
       const str=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
-      banhos.push({id:uid(),tipo,tutorId,animalId,data:str,horario,valor});
+      banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data:str,horario,valor});
+      dt.setDate(dt.getDate()+7); // próximo banho semanal
     }
   }
   save(LS_BANHOS,banhos);
   renderCalendario();
-  document.getElementById('dataBanho').value='';document.getElementById('horario').value='';document.getElementById('valor').value='';
+
+  // limpa
+  document.getElementById('dataBanho').value='';
+  document.getElementById('horario').value='';
+  document.getElementById('valor').value='';
 }
+
+/* RENDERIZA BANHOS NO CALENDÁRIO */
+function renderCalendario(){
+  const calendario=document.getElementById('calendario');
+  calendario.innerHTML='';
+  const hoje=new Date();
+  const ano=hoje.getFullYear(), mes=hoje.getMonth();
+
+  for(let m=0;m<2;m++){ // mês atual e próximo
+    const data=new Date(ano,mes+m,1);
+    const nomeMes=data.toLocaleString('pt-BR',{month:'long'});
+    const dias=new Date(ano,mes+m+1,0).getDate();
+
+    const mesDiv=document.createElement('div');
+    mesDiv.className='mes';
+    mesDiv.innerHTML=`<h2>${nomeMes} ${data.getFullYear()}</h2>`;
+
+    const head=document.createElement('div');
+    head.className='dias-semana';
+    head.innerHTML='<div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>';
+    mesDiv.appendChild(head);
+
+    const grid=document.createElement('div');
+    grid.className='dias';
+
+    // calcular dia da semana do 1º dia (0=Domingo…6=Sábado → queremos 1=Seg)
+    let start=(new Date(ano,mes+m,1).getDay()+6)%7;
+    for(let i=0;i<start;i++) grid.appendChild(document.createElement('div'));
+
+    const banhos=load(LS_BANHOS);
+
+    for(let d=1;d<=dias;d++){
+      const cell=document.createElement('div');
+      cell.className='dia';
+      const num=document.createElement('div');
+      num.className='dia-num';
+      num.innerText=d;
+      cell.appendChild(num);
+
+      const dataStr=`${ano}-${String(mes+m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+      banhos.filter(b=>b.data===dataStr).forEach(b=>{
+        const btn=document.createElement('button');
+        btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
+        btn.innerText=`${buscarAnimal(b.animalId)}\n${b.horario}`;
+        btn.onclick=()=>gerenciarBanho(b);
+        cell.appendChild(btn);
+      });
+
+      grid.appendChild(cell);
+    }
+    mesDiv.appendChild(grid);
+    calendario.appendChild(mesDiv);
+  }
+}
+
+/* AUXILIAR – nome do animal */
+function buscarAnimal(id){
+  const tutores=load(LS_TUTORES);
+  for(const t of tutores){
+    const a=t.animais.find(x=>x.id===id);
+    if(a) return a.nome;
+  }
+  return "Cliente";
+}
+
+/* EDITAR/EXCLUIR BANHO */
+function gerenciarBanho(b){
+  const escolha=prompt("Digite:\n1 - Editar horário\n2 - Excluir este banho\n3 - Excluir pacote inteiro");
+  if(escolha==="1"){
+    const novo=prompt("Novo horário (HH:MM):",b.horario);
+    if(novo){
+      let banhos=load(LS_BANHOS);
+      banhos=banhos.map(x=>x.id===b.id?{...x,horario:novo}:x);
+      save(LS_BANHOS,banhos);
+    }
+  } else if(escolha==="2"){
+    let banhos=load(LS_BANHOS).filter(x=>x.id!==b.id);
+    save(LS_BANHOS,banhos);
+  } else if(escolha==="3"){
+    let banhos=load(LS_BANHOS).filter(x=>x.pacoteId!==b.pacoteId);
+    save(LS_BANHOS,banhos);
+  }
+  renderCalendario();
+}
+
 </script>
 
 </body>
 </html>
+
 
