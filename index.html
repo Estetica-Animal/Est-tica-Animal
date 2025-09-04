@@ -35,7 +35,7 @@ nav a{display:inline-block; color:#fff; text-decoration:none; font-weight:bold; 
 nav a:hover{background:#fff; color:var(--rosa)}
 nav a.ativo{background:#fff; color:var(--rosa)}
 
-main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
+main{max-width:1200px; margin:0 auto 60px; padding:100px 16px 24px 16px;} /* deixa espaço pro rodapé fixo */
 
 /* ======= AGENDA ======= */
 #agendaMain{display:flex; gap:20px; align-items:flex-start}
@@ -55,7 +55,8 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 #sidebar h3{margin-top:0; color:var(--rosa-escuro); text-align:center}
 .field{margin-bottom:10px}
 .field label{display:block; font-size:13px; margin-bottom:4px}
-.field input, .field select{width:100%; padding:10px; border:2px solid var(--rosa); border-radius:10px; background:#fff;}
+.field input, .field select, .field textarea{width:100%; padding:10px; border:2px solid var(--rosa); border-radius:10px; background:#fff;}
+.field textarea{resize:vertical; min-height:60px;}
 .btn{display:inline-block; width:100%; border:none; border-radius:10px; padding:10px 12px; font-weight:bold; cursor:pointer; transition:.2s; box-shadow:var(--sombra);}
 .btn:hover{transform:translateY(-1px)}
 .btn-avulso{background:var(--azul); color:#fff}
@@ -66,7 +67,10 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 #listaTutores h3{margin-top:0; color:var(--rosa-escuro);}
 .tutor-card{border-bottom:1px solid #eee; padding:10px 0; display:flex; flex-direction:column; gap:6px;}
 .tutor-card span{font-size:14px;}
+.tutor-actions{display:flex; gap:8px; margin-top:6px;}
+.tutor-actions i{cursor:pointer;}
 .animal{display:flex; align-items:center; gap:10px; margin-top:6px; justify-content:space-between;}
+.animal-left{display:flex; align-items:center; gap:10px;}
 .animal img{width:40px; height:40px; border-radius:50%; object-fit:cover;}
 .edit-icon{cursor:pointer; color:var(--rosa-escuro); margin-left:6px;}
 .edit-icon:hover{color:var(--rosa);}
@@ -82,7 +86,7 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
 /* ======= MODAL ======= */
 #modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
-#modal{background:#fff; width:95%; max-width:420px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+#modal{background:#fff; width:95%; max-width:460px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
 #modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
 .modal-row{display:flex; gap:10px; margin:8px 0;}
 .modal-row > *{flex:1;}
@@ -90,6 +94,14 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 .btn-danger{background:#dc3545; color:#fff;}
 .btn-secondary{background:#6c757d; color:#fff;}
 .small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
+
+/* ======= RODAPÉ ======= */
+footer{
+  position:fixed; left:0; right:0; bottom:0;
+  background:#fff; color:#777; border-top:1px solid #eee;
+  padding:6px 12px; font-size:12px; text-align:center;
+}
+footer b{color:#555;}
 </style>
 
 <!-- Firebase (compat builds para usar firebase.firestore()/auth()) -->
@@ -155,6 +167,11 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
       <div class="field"><label for="dataBanho">Data</label><input type="date" id="dataBanho" /></div>
       <div class="field"><label for="horario">Horário</label><input type="time" id="horario" /></div>
       <div class="field"><label for="valor">Valor (opcional)</label><input type="number" id="valor" step="0.01" min="0" /></div>
+      <!-- NOVO: OBSERVAÇÕES -->
+      <div class="field">
+        <label for="obs">Observações (opcional)</label>
+        <textarea id="obs" placeholder="Ex.: usar shampoo hipoalergênico, é arisco, etc."></textarea>
+      </div>
       <button class="btn btn-avulso" onclick="adicionarBanho()">Adicionar</button>
     </aside>
   </section>
@@ -182,7 +199,7 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
   </section>
 </main>
 
-<!-- ======= MODAL EDIÇÃO ======= -->
+<!-- ======= MODAL EDIÇÃO AGENDA ======= -->
 <div id="modalOverlay">
   <div id="modal">
     <h3>Gerenciar Agendamento</h3>
@@ -200,6 +217,13 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
         </select>
       </div>
     </div>
+    <!-- NOVO: OBSERVAÇÕES NO MODAL -->
+    <div class="modal-row">
+      <div style="flex:1">
+        <label>Observações</label>
+        <textarea id="modalObs" placeholder="Observações deste agendamento (opcional)"></textarea>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-avulso" onclick="salvarEdicaoBanho()">Salvar alterações</button>
       <button class="btn btn-danger" onclick="excluirEsteBanho()">Excluir apenas este</button>
@@ -208,6 +232,11 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
     </div>
   </div>
 </div>
+
+<!-- ======= RODAPÉ ======= -->
+<footer>
+  <b>v1.0</b> — Produzido por Leocir
+</footer>
 
 <script>
 /* ==================== FIREBASE INIT ==================== */
@@ -358,7 +387,13 @@ async function renderCalendario(){
       for(const b of lista){
         const btn=document.createElement('button');
         btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
-        btn.textContent=`${getAnimalNome(b.tutorId,b.animalId)} — ${b.horario}`;
+
+        // Ícone de observação se existir
+        const temObs=b.obs && b.obs.trim().length>0;
+        const obsIcon = temObs ? ' 💬' : '';
+
+        btn.textContent=`${getAnimalNome(b.tutorId,b.animalId)} — ${b.horario}${obsIcon}`;
+        btn.title = temObs ? b.obs : ''; // tooltip com observações
         btn.onclick=()=>abrirModal(b.id);
         cell.appendChild(btn);
       }
@@ -378,13 +413,14 @@ async function adicionarTutor(){
   const tel=document.getElementById('tutorTelefone').value.trim();
   if(!nome) return alert('Informe o nome');
 
-  const docRef=await db.collection('tutores').add({nome,endereco,tel});
+  await db.collection('tutores').add({nome,endereco,tel});
   document.getElementById('tutorNome').value='';
   document.getElementById('tutorEndereco').value='';
   document.getElementById('tutorTelefone').value='';
   await refreshCacheTutores();
   await renderTutores();
 }
+
 async function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
@@ -414,6 +450,7 @@ async function adicionarAnimal(){
     await atualizarTutoresSelect();
   }
 }
+
 async function renderTutores(){
   const container=document.getElementById('tutoresContainer');
   const sel=document.getElementById('animalTutor');
@@ -426,33 +463,58 @@ async function renderTutores(){
     div.className='tutor-card';
     div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
 
+    // Ações do tutor: editar e excluir
+    const actions=document.createElement('div');
+    actions.className='tutor-actions';
+    const btnEditTutor=document.createElement('i');
+    btnEditTutor.className="fa-solid fa-pen edit-icon";
+    btnEditTutor.title='Editar tutor';
+    btnEditTutor.onclick=()=>editarTutor(t.id);
     const btnExcluir=document.createElement('i');
     btnExcluir.className="fa-solid fa-trash edit-icon";
     btnExcluir.title='Excluir tutor';
     btnExcluir.onclick=()=>excluirTutor(t.id);
-    div.appendChild(btnExcluir);
+    actions.appendChild(btnEditTutor);
+    actions.appendChild(btnExcluir);
+    div.appendChild(actions);
 
+    // Animais
     t.animais.forEach(a=>{
       const an=document.createElement('div');
       an.className='animal';
-      an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
+      const left=document.createElement('div');
+      left.className='animal-left';
+      if(a.foto){ const img=document.createElement('img'); img.src=a.foto; left.appendChild(img); }
+      const span=document.createElement('span'); span.textContent=a.nome; left.appendChild(span);
+      an.appendChild(left);
+
+      const right=document.createElement('div');
+      const editAni=document.createElement('i');
+      editAni.className="fa-solid fa-pen edit-icon";
+      editAni.title='Editar cliente';
+      editAni.onclick=()=>editarAnimal(t.id,a.id);
       const delAni=document.createElement('i');
       delAni.className="fa-solid fa-trash edit-icon";
       delAni.title='Excluir cliente';
       delAni.onclick=()=>excluirAnimal(t.id,a.id);
-      an.appendChild(delAni);
+      right.appendChild(editAni);
+      right.appendChild(delAni);
+
+      an.appendChild(right);
       div.appendChild(an);
     });
 
     container.appendChild(div);
   }
 }
+
 async function atualizarTutoresSelect(){
   const sel=document.getElementById('tutorSelect');
   sel.innerHTML='<option value="">Selecione um tutor</option>';
   TUTORES_CACHE.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
   await carregarAnimais();
 }
+
 async function carregarAnimais(){
   const tutorId=document.getElementById('tutorSelect').value;
   const sel=document.getElementById('animalSelect');
@@ -460,12 +522,14 @@ async function carregarAnimais(){
   const t=TUTORES_CACHE.find(x=>x.id===tutorId);
   if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
 }
+
 function getAnimalNome(tutorId, animalId){
   const t=TUTORES_CACHE.find(x=>x.id===tutorId);
   if(!t) return 'Cliente';
   const a=t.animais.find(x=>x.id===animalId);
   return a? a.nome : 'Cliente';
 }
+
 async function excluirTutor(tutorId){
   if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
   // apaga subcoleção animais
@@ -488,6 +552,7 @@ async function excluirTutor(tutorId){
   await atualizarTutoresSelect();
   await renderCalendario();
 }
+
 async function excluirAnimal(tutorId, animalId){
   if(!confirm('Excluir este cliente e banhos vinculados?')) return;
   await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
@@ -504,6 +569,72 @@ async function excluirAnimal(tutorId, animalId){
   await renderCalendario();
 }
 
+/* ====== EDITAR TUTOR / ANIMAL ====== */
+// Usa prompts simples para edição rápida
+async function editarTutor(tutorId){
+  const ref=db.collection('tutores').doc(tutorId);
+  const snap=await ref.get();
+  if(!snap.exists) return;
+  const t=snap.data();
+
+  const nome = prompt('Nome do tutor:', t.nome||'');
+  if(nome===null) return;
+  const endereco = prompt('Endereço:', t.endereco||'');
+  if(endereco===null) return;
+  const tel = prompt('Telefone:', t.tel||'');
+  if(tel===null) return;
+
+  await ref.update({nome:nome.trim(), endereco:endereco.trim(), tel:tel.trim()});
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
+}
+
+async function editarAnimal(tutorId, animalId){
+  const ref=db.collection('tutores').doc(tutorId).collection('animais').doc(animalId);
+  const snap=await ref.get();
+  if(!snap.exists) return;
+  const a=snap.data();
+
+  const nome = prompt('Nome do cliente:', a.nome||'');
+  if(nome===null) return;
+
+  // Pergunta se deseja trocar a foto
+  const trocar = confirm('Deseja atualizar a foto deste cliente?');
+  if(trocar){
+    // cria um input file temporário
+    const fileInput=document.createElement('input');
+    fileInput.type='file';
+    fileInput.accept='image/*';
+    fileInput.onchange=async (ev)=>{
+      const file=ev.target.files[0];
+      if(file){
+        const reader=new FileReader();
+        reader.onload=async e=>{
+          const foto=e.target.result;
+          await ref.update({nome:nome.trim(), foto});
+          await refreshCacheTutores();
+          await renderTutores();
+          await atualizarTutoresSelect();
+        };
+        reader.readAsDataURL(file);
+      }else{
+        // se não escolheu foto, atualiza só o nome
+        await ref.update({nome:nome.trim()});
+        await refreshCacheTutores();
+        await renderTutores();
+        await atualizarTutoresSelect();
+      }
+    };
+    fileInput.click();
+  }else{
+    await ref.update({nome:nome.trim()});
+    await refreshCacheTutores();
+    await renderTutores();
+    await atualizarTutoresSelect();
+  }
+}
+
 /* ==================== BANHOS ==================== */
 function togglePacoteOptions(){
   const tipo=document.getElementById('tipoBanho').value;
@@ -517,6 +648,7 @@ async function adicionarBanho(){
   const data=document.getElementById('dataBanho').value; // YYYY-MM-DD
   const horario=document.getElementById('horario').value;
   const valor=document.getElementById('valor').value || '';
+  const obs=(document.getElementById('obs').value || '').trim(); // NOVO
 
   if(!tutorId || !animalId || !data || !horario){
     alert('Preencha tutor, cliente, data e horário.');
@@ -526,14 +658,14 @@ async function adicionarBanho(){
   const pacoteId = (tipo==='pacote') ? uid() : null;
 
   if(tipo==='avulso'){
-    const banho = { tipo, tutorId, animalId, data, horario, valor, pacoteId:null };
+    const banho = { tipo, tutorId, animalId, data, horario, valor, pacoteId:null, obs };
     await db.collection('banhos').add(banho);
   } else {
     const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
     let atual=data;
     for(let i=0;i<qtd;i++){
       if(i>0) atual = addDaysYMD(atual, 7);
-      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, pacoteId };
+      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, pacoteId, obs };
       await db.collection('banhos').add(banho);
     }
   }
@@ -548,6 +680,7 @@ async function adicionarBanho(){
   document.getElementById('dataBanho').value='';
   document.getElementById('horario').value='';
   document.getElementById('valor').value='';
+  document.getElementById('obs').value='';
 }
 
 /* ==================== MODAL: editar/excluir ==================== */
@@ -563,6 +696,7 @@ async function abrirModal(banhoId){
   document.getElementById('modalHorario').value=b.horario;
   document.getElementById('modalAplicarPacote').value='nao';
   document.getElementById('btnExcluirPacote').style.display = (b.pacoteId) ? 'block':'none';
+  document.getElementById('modalObs').value = b.obs || ''; // NOVO
 
   document.getElementById('modalOverlay').style.display='flex';
 }
@@ -572,6 +706,7 @@ function fecharModal(){
 }
 async function salvarEdicaoBanho(){
   const novoHorario=document.getElementById('modalHorario').value;
+  const novaObs=(document.getElementById('modalObs').value||'').trim(); // NOVO
   const aplicar=document.getElementById('modalAplicarPacote').value==='sim';
   if(!modalBanhoId || !novoHorario) return;
 
@@ -583,10 +718,10 @@ async function salvarEdicaoBanho(){
   if(aplicar && alvo.pacoteId){
     const snap=await db.collection('banhos').where('pacoteId','==',alvo.pacoteId).get();
     const batch=db.batch();
-    snap.forEach(doc=> batch.update(doc.ref,{horario:novoHorario}));
+    snap.forEach(doc=> batch.update(doc.ref,{horario:novoHorario, obs:novaObs}));
     await batch.commit();
   }else{
-    await alvoRef.update({horario:novoHorario});
+    await alvoRef.update({horario:novoHorario, obs:novaObs});
   }
 
   fecharModal();
