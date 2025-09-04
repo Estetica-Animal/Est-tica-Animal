@@ -160,16 +160,27 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
 <script>
 /* LOGIN */
-const usuarios=[{user:'Kamilly',pass:'petshop2025'},{user:'Leocir',pass:'admin'}];
-function fazerLogin(){
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value.trim();
-  const ok=usuarios.find(x=>x.user===u && x.pass===p);
-  if(ok){
-    document.getElementById('loginScreen').style.display='none';
+const usuarios = [
+  { user: 'kamilly', pass: 'petshop2025' },
+  { user: 'leocir', pass: 'admin' }
+];
+
+function fazerLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value.trim();
+
+  const ok = usuarios.find(x => x.user === u && x.pass === p);
+
+  if (ok) {
+    document.getElementById('loginScreen').style.display = 'none';
     mostrarAgenda();
-  } else { alert('Usuário ou senha incorretos'); }
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+  } else {
+    alert('Usuário ou senha incorretos');
+  }
 }
+
 
 /* STORAGE */
 const LS_TUTORES='tutores';
@@ -352,3 +363,4 @@ function adicionarBanho(){
 
 </body>
 </html>
+
