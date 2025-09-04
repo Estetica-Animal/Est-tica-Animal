@@ -77,6 +77,17 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 #loginScreen input{width:220px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
 #loginScreen button{width:100%; max-width:240px; padding:10px; margin-top:12px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
 #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+
+/* ======= MODAL ======= */
+#modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
+#modal{background:#fff; width:95%; max-width:420px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+#modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
+.modal-row{display:flex; gap:10px; margin:8px 0;}
+.modal-row > *{flex:1;}
+.modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
+.btn-danger{background:#dc3545; color:#fff;}
+.btn-secondary{background:#6c757d; color:#fff;}
+.small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
 </style>
 </head>
 <body>
@@ -130,7 +141,7 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
       </div>
       <div class="field"><label for="dataBanho">Data</label><input type="date" id="dataBanho" /></div>
       <div class="field"><label for="horario">Horário</label><input type="time" id="horario" /></div>
-      <div class="field"><label for="valor">Valor</label><input type="number" id="valor" step="0.01" min="0" /></div>
+      <div class="field"><label for="valor">Valor (opcional)</label><input type="number" id="valor" step="0.01" min="0" /></div>
       <button class="btn btn-avulso" onclick="adicionarBanho()">Adicionar</button>
     </aside>
   </section>
@@ -158,105 +169,143 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
   </section>
 </main>
 
+<!-- ======= MODAL EDIÇÃO ======= -->
+<div id="modalOverlay">
+  <div id="modal">
+    <h3>Gerenciar Agendamento</h3>
+    <div class="small" id="modalInfo"></div>
+    <div class="modal-row">
+      <div>
+        <label>Horário</label>
+        <input type="time" id="modalHorario">
+      </div>
+      <div>
+        <label>Aplicar ao pacote?</label>
+        <select id="modalAplicarPacote">
+          <option value="nao">Não</option>
+          <option value="sim">Sim</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-avulso" onclick="salvarEdicaoBanho()">Salvar alterações</button>
+      <button class="btn btn-danger" onclick="excluirEsteBanho()">Excluir apenas este</button>
+      <button class="btn btn-danger" id="btnExcluirPacote" style="display:none" onclick="excluirPacote()">Excluir pacote inteiro</button>
+      <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-/* LOGIN */
-const usuarios = [
-  { user: 'kamilly', pass: 'petshop2025' },
-  { user: 'leocir', pass: 'admin' }
-];
-
-function fazerLogin() {
-  const u = document.getElementById('loginUser').value.trim().toLowerCase();
-  const p = document.getElementById('loginPass').value.trim();
-
-  const ok = usuarios.find(x => x.user === u && x.pass === p);
-
-  if (ok) {
-    document.getElementById('loginScreen').style.display = 'none';
-    mostrarAgenda();
-    document.getElementById('loginUser').value = '';
-    document.getElementById('loginPass').value = '';
-  } else {
-    alert('Usuário ou senha incorretos');
-  }
-}
-
-
-/* STORAGE */
+/* ==================== UTIL / STORAGE ==================== */
 const LS_TUTORES='tutores';
 const LS_BANHOS='banhos';
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const load=(k)=>JSON.parse(localStorage.getItem(k)||'[]');
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 
-/* NAV */
+/* Helpers de data SEM fuso/UTC (sempre string YYYY-MM-DD) */
+const pad2=n=>String(n).padStart(2,'0');
+const toYMD=(y,m,d)=>`${y}-${pad2(m)}-${pad2(d)}`;
+function addDaysYMD(ymd, days){
+  const [Y,M,D]=ymd.split('-').map(Number);
+  const dt=new Date(Y, M-1, D+days); // construtor local, evita UTC
+  return toYMD(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
+}
+
+/* ==================== LOGIN ==================== */
+const usuarios = [
+  { user: 'kamilly', pass: 'petshop2025' },
+  { user: 'leocir', pass: 'admin' }
+];
+function fazerLogin(){
+  const u=document.getElementById('loginUser').value.trim().toLowerCase();
+  const p=document.getElementById('loginPass').value.trim();
+  const ok=usuarios.find(x=>x.user===u && x.pass===p);
+  if(ok){
+    document.getElementById('loginScreen').style.display='none';
+    mostrarAgenda();
+    document.getElementById('loginUser').value='';
+    document.getElementById('loginPass').value='';
+  }else{
+    alert('Usuário ou senha incorretos');
+  }
+}
+
+/* ==================== NAV ==================== */
 function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));document.getElementById(id).classList.add('ativo');}
 function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');renderCalendario();atualizarTutoresSelect();}
 function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');renderTutores();}
 
-/* CALENDÁRIO: mês atual + próximo */
+/* ==================== CALENDÁRIO ==================== */
 function renderCalendario(){
   const calendario=document.getElementById('calendario');
   calendario.innerHTML='';
+
   const hoje=new Date();
+  const baseAno=hoje.getFullYear();
+  const baseMes=hoje.getMonth(); // 0-11
+
   const banhos=load(LS_BANHOS);
-  
-  for(let i=0;i<2;i++){
-    const data=new Date(hoje.getFullYear(),hoje.getMonth()+i,1);
-    const mes=data.toLocaleString('pt-BR',{month:'long',year:'numeric'});
+  // Indexa banhos por data para renderizar rápido
+  const porData=new Map();
+  for(const b of banhos){
+    if(!porData.has(b.data)) porData.set(b.data,[]);
+    porData.get(b.data).push(b);
+  }
+
+  for(let offset=0; offset<2; offset++){
+    const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1); // local
+    const ano=primeiroDiaMes.getFullYear();
+    const mes=primeiroDiaMes.getMonth(); // 0..11
+    const nomeMes=primeiroDiaMes.toLocaleString('pt-BR',{month:'long'});
+    const diasNoMes=new Date(ano, mes+1, 0).getDate();
+
     const mesDiv=document.createElement('div');
     mesDiv.className='mes';
-    mesDiv.innerHTML=`<h2>${mes}</h2>
+    mesDiv.innerHTML=`<h2>${nomeMes} ${ano}</h2>
       <div class="dias-semana">
         <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>
       </div>`;
-    
-    const diasDiv=document.createElement('div');
-    diasDiv.className='dias';
 
-    const primeiroDia=(data.getDay()+6)%7; // segunda=0
-    for(let j=0;j<primeiroDia;j++){ diasDiv.innerHTML+='<div></div>'; }
+    const grid=document.createElement('div');
+    grid.className='dias';
 
-    const ultimoDia=new Date(data.getFullYear(),data.getMonth()+1,0).getDate();
-    for(let d=1;d<=ultimoDia;d++){
-      const dia=document.createElement('div');
-      dia.className='dia';
-      if(d===hoje.getDate() && i===0) dia.classList.add('hoje');
-      dia.innerHTML=`<div class="dia-num">${d}</div>`;
+    // Segunda a domingo: (getDay() 0=Dom → 6=Sáb) => segunda=0
+    const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
+    for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
-      const diaStr=`${data.getFullYear()}-${String(data.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      banhos.filter(b=>b.data===diaStr).forEach(b=>{
-        const badge=document.createElement('button');
-        badge.className='badge '+b.tipo;
-        badge.textContent=`${getAnimalNome(b.animalId)} (${b.horario})`;
-        dia.appendChild(badge);
-      });
+    for(let d=1; d<=diasNoMes; d++){
+      const cell=document.createElement('div');
+      cell.className='dia';
 
-      diasDiv.appendChild(dia);
+      // marca hoje
+      if(offset===0 && d===hoje.getDate()) cell.classList.add('hoje');
+
+      const num=document.createElement('div');
+      num.className='dia-num';
+      num.textContent=d;
+      cell.appendChild(num);
+
+      const dayStr=toYMD(ano, mes+1, d);
+      const lista=porData.get(dayStr)||[];
+      for(const b of lista){
+        const btn=document.createElement('button');
+        btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
+        btn.textContent=`${getAnimalNome(b.animalId)} — ${b.horario}`;
+        btn.onclick=()=>abrirModal(b.id); // gerenciar
+        cell.appendChild(btn);
+      }
+
+      grid.appendChild(cell);
     }
 
-    mesDiv.appendChild(diasDiv);
+    mesDiv.appendChild(grid);
     calendario.appendChild(mesDiv);
   }
 }
 
-/* AUX: nome do animal */
-function getAnimalNome(animalId){
-  const tutores=load(LS_TUTORES);
-  for(const t of tutores){
-    const a=t.animais.find(x=>x.id===animalId);
-    if(a) return a.nome;
-  }
-  return 'Cliente';
-}
-
-/* PACOTE */
-function togglePacoteOptions(){
-  const tipo=document.getElementById('tipoBanho').value;
-  document.getElementById('pacoteOptions').style.display=(tipo==='pacote')?'block':'none';
-}
-
-/* TUTORES */
+/* ==================== TUTORES / CLIENTES ==================== */
 function adicionarTutor(){
   const nome=document.getElementById('tutorNome').value.trim();
   const endereco=document.getElementById('tutorEndereco').value.trim();
@@ -268,7 +317,8 @@ function adicionarTutor(){
   document.getElementById('tutorNome').value='';
   document.getElementById('tutorEndereco').value='';
   document.getElementById('tutorTelefone').value='';
-  renderTutores(); atualizarTutoresSelect();
+  renderTutores();
+  atualizarTutoresSelect();
 }
 function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
@@ -290,7 +340,8 @@ function salvarAnimal(tutorId,nome,foto){
   save(LS_TUTORES,tutores);
   document.getElementById('animalNome').value='';
   document.getElementById('animalFoto').value='';
-  renderTutores(); atualizarTutoresSelect();
+  renderTutores();
+  atualizarTutoresSelect();
 }
 function renderTutores(){
   const tutores=load(LS_TUTORES);
@@ -302,28 +353,72 @@ function renderTutores(){
     sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
     const div=document.createElement('div');
     div.className='tutor-card';
-    div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco} - ${t.tel}`;
-    const btnEditar=document.createElement('i'); btnEditar.className="fa-solid fa-pencil edit-icon"; btnEditar.onclick=()=>alert('Editar Tutor: '+t.nome);
-    const btnExcluir=document.createElement('i'); btnExcluir.className="fa-solid fa-trash edit-icon"; btnExcluir.onclick=()=>excluirTutor(t.id);
-    div.appendChild(btnEditar); div.appendChild(btnExcluir);
+    div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
+
+    const btnEditar=document.createElement('i');
+    btnEditar.className="fa-solid fa-pencil edit-icon";
+    btnEditar.title='Editar tutor';
+    btnEditar.onclick=()=>alert('Editar Tutor: '+t.nome);
+
+    const btnExcluir=document.createElement('i');
+    btnExcluir.className="fa-solid fa-trash edit-icon";
+    btnExcluir.title='Excluir tutor';
+    btnExcluir.onclick=()=>excluirTutor(t.id);
+
+    div.appendChild(btnEditar);
+    div.appendChild(btnExcluir);
+
     t.animais.forEach(a=>{
-      const an=document.createElement('div'); an.className='animal';
+      const an=document.createElement('div');
+      an.className='animal';
       an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
-      const editAni=document.createElement('i'); editAni.className="fa-solid fa-pencil edit-icon"; editAni.onclick=()=>alert('Editar Animal: '+a.nome);
-      const delAni=document.createElement('i'); delAni.className="fa-solid fa-trash edit-icon"; delAni.onclick=()=>excluirAnimal(t.id,a.id);
-      an.appendChild(editAni); an.appendChild(delAni);
+      const editAni=document.createElement('i');
+      editAni.className="fa-solid fa-pencil edit-icon";
+      editAni.title='Editar cliente';
+      editAni.onclick=()=>alert('Editar Cliente: '+a.nome);
+      const delAni=document.createElement('i');
+      delAni.className="fa-solid fa-trash edit-icon";
+      delAni.title='Excluir cliente';
+      delAni.onclick=()=>excluirAnimal(t.id,a.id);
+      an.appendChild(editAni);
+      an.appendChild(delAni);
       div.appendChild(an);
     });
     container.appendChild(div);
   });
 }
-function excluirTutor(id){if(!confirm('Excluir tutor e seus clientes?')) return;let tutores=load(LS_TUTORES);tutores=tutores.filter(t=>t.id!==id);save(LS_TUTORES,tutores);renderTutores();atualizarTutoresSelect();}
-function excluirAnimal(tutorId,animalId){let tutores=load(LS_TUTORES);const t=tutores.find(x=>x.id===tutorId);if(t){t.animais=t.animais.filter(a=>a.id!==animalId);}save(LS_TUTORES,tutores);renderTutores();atualizarTutoresSelect();}
+function excluirTutor(id){
+  if(!confirm('Excluir este tutor e todos os clientes vinculados?')) return;
+  let tutores=load(LS_TUTORES);
+  tutores=tutores.filter(t=>t.id!==id);
+  save(LS_TUTORES,tutores);
+
+  // também removemos banhos associados ao tutor
+  let banhos=load(LS_BANHOS).filter(b=>b.tutorId!==id);
+  save(LS_BANHOS,banhos);
+
+  renderTutores(); atualizarTutoresSelect(); renderCalendario();
+}
+function excluirAnimal(tutorId, animalId){
+  if(!confirm('Excluir este cliente?')) return;
+  const tutores=load(LS_TUTORES);
+  const t=tutores.find(x=>x.id===tutorId);
+  if(!t) return;
+  t.animais=t.animais.filter(a=>a.id!==animalId);
+  save(LS_TUTORES,tutores);
+
+  // remove banhos deste animal
+  let banhos=load(LS_BANHOS).filter(b=>b.animalId!==animalId);
+  save(LS_BANHOS,banhos);
+
+  renderTutores(); atualizarTutoresSelect(); renderCalendario();
+}
 function atualizarTutoresSelect(){
   const tutores=load(LS_TUTORES);
   const sel=document.getElementById('tutorSelect');
   sel.innerHTML='<option value="">Selecione um tutor</option>';
-  tutores.forEach(t=>{sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;});
+  tutores.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
+  carregarAnimais();
 }
 function carregarAnimais(){
   const tutorId=document.getElementById('tutorSelect').value;
@@ -331,135 +426,136 @@ function carregarAnimais(){
   const t=tutores.find(x=>x.id===tutorId);
   const sel=document.getElementById('animalSelect');
   sel.innerHTML='<option value="">Selecione um cliente</option>';
-  if(t){t.animais.forEach(a=>{sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`;});}
+  if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
+}
+function getAnimalNome(animalId){
+  const tutores=load(LS_TUTORES);
+  for(const t of tutores){
+    const a=t.animais.find(x=>x.id===animalId);
+    if(a) return a.nome;
+  }
+  return 'Cliente';
 }
 
-/* BANHOS */
+/* ==================== BANHOS ==================== */
+function togglePacoteOptions(){
+  const tipo=document.getElementById('tipoBanho').value;
+  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
+}
+
 function adicionarBanho(){
   const tipo=document.getElementById('tipoBanho').value;
   const tutorId=document.getElementById('tutorSelect').value;
   const animalId=document.getElementById('animalSelect').value;
-  const data=document.getElementById('dataBanho').value; // já vem como YYYY-MM-DD
+  const data=document.getElementById('dataBanho').value; // YYYY-MM-DD
   const horario=document.getElementById('horario').value;
-  const valor=document.getElementById('valor').value;
+  const valor=document.getElementById('valor').value || '';
 
-  if(!tutorId||!animalId||!data||!horario) return alert('Preencha todos os campos');
+  if(!tutorId || !animalId || !data || !horario){
+    alert('Preencha tutor, cliente, data e horário.');
+    return;
+  }
 
   const banhos=load(LS_BANHOS);
-  const pacoteId = uid();
+  const pacoteId = (tipo==='pacote') ? uid() : null;
 
   if(tipo==='avulso'){
-    banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data,horario,valor});
+    // grava exatamente a data digitada (string), sem criar Date -> evita fuso
+    banhos.push({id:uid(), pacoteId, tipo, tutorId, animalId, data, horario, valor});
   } else {
-    const qtd=parseInt(document.getElementById('pacoteSelecionado').value);
-    let [ano,mes,dia]=data.split("-").map(Number);
+    const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
+    // soma em passos de 7 dias a partir da data base (sempre com construtor local)
+    let atual=data;
     for(let i=0;i<qtd;i++){
-      const d=new Date(ano,mes-1,dia+(i*7)); // aqui só usamos Date p/ somar semanas
-      const str=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data:str,horario,valor});
+      if(i>0) atual = addDaysYMD(atual, 7);
+      banhos.push({id:uid(), pacoteId, tipo, tutorId, animalId, data:atual, horario, valor});
     }
   }
+
   save(LS_BANHOS,banhos);
   renderCalendario();
 
-  // limpa
+  // limpa campos
+  document.getElementById('tipoBanho').value='avulso';
+  togglePacoteOptions();
+  document.getElementById('tutorSelect').value='';
+  carregarAnimais();
   document.getElementById('dataBanho').value='';
   document.getElementById('horario').value='';
   document.getElementById('valor').value='';
 }
 
+/* ==================== MODAL: editar/excluir ==================== */
+let modalBanhoId=null;
+function abrirModal(banhoId){
+  modalBanhoId=banhoId;
+  const banhos=load(LS_BANHOS);
+  const b=banhos.find(x=>x.id===banhoId);
+  if(!b) return;
 
-/* RENDERIZA BANHOS NO CALENDÁRIO */
-function renderCalendario(){
-  const calendario=document.getElementById('calendario');
-  calendario.innerHTML='';
-  const hoje=new Date();
-  const ano=hoje.getFullYear(), mes=hoje.getMonth();
+  const info = `${getAnimalNome(b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
+  document.getElementById('modalInfo').textContent=info;
+  document.getElementById('modalHorario').value=b.horario;
+  document.getElementById('modalAplicarPacote').value='nao';
 
-  for(let m=0;m<2;m++){ // mês atual e próximo
-    const data=new Date(ano,mes+m,1);
-    const nomeMes=data.toLocaleString('pt-BR',{month:'long'});
-    const dias=new Date(ano,mes+m+1,0).getDate();
+  // mostrar botão "Excluir pacote" apenas se for pacote
+  document.getElementById('btnExcluirPacote').style.display = (b.pacoteId) ? 'block':'none';
 
-    const mesDiv=document.createElement('div');
-    mesDiv.className='mes';
-    mesDiv.innerHTML=`<h2>${nomeMes} ${data.getFullYear()}</h2>`;
-
-    const head=document.createElement('div');
-    head.className='dias-semana';
-    head.innerHTML='<div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>';
-    mesDiv.appendChild(head);
-
-    const grid=document.createElement('div');
-    grid.className='dias';
-
-    // calcular dia da semana do 1º dia (0=Domingo…6=Sábado → queremos 1=Seg)
-    let start=(new Date(ano,mes+m,1).getDay()+6)%7;
-    for(let i=0;i<start;i++) grid.appendChild(document.createElement('div'));
-
-    const banhos=load(LS_BANHOS);
-
-    for(let d=1;d<=dias;d++){
-      const cell=document.createElement('div');
-      cell.className='dia';
-      const num=document.createElement('div');
-      num.className='dia-num';
-      num.innerText=d;
-      cell.appendChild(num);
-
-      const dataStr=`${ano}-${String(mes+m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-
-      banhos.filter(b=>b.data===dataStr).forEach(b=>{
-        const btn=document.createElement('button');
-        btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
-        btn.innerText=`${buscarAnimal(b.animalId)}\n${b.horario}`;
-        btn.onclick=()=>gerenciarBanho(b);
-        cell.appendChild(btn);
-banhos.filter(b=>b.data===dataStr).forEach(b=>{
-   // mostra no calendário
-});
-
-      grid.appendChild(cell);
-    }
-    mesDiv.appendChild(grid);
-    calendario.appendChild(mesDiv);
-  }
+  document.getElementById('modalOverlay').style.display='flex';
 }
-
-/* AUXILIAR – nome do animal */
-function buscarAnimal(id){
-  const tutores=load(LS_TUTORES);
-  for(const t of tutores){
-    const a=t.animais.find(x=>x.id===id);
-    if(a) return a.nome;
-  }
-  return "Cliente";
+function fecharModal(){
+  document.getElementById('modalOverlay').style.display='none';
+  modalBanhoId=null;
 }
+function salvarEdicaoBanho(){
+  const novoHorario=document.getElementById('modalHorario').value;
+  const aplicar=document.getElementById('modalAplicarPacote').value==='sim';
+  if(!modalBanhoId || !novoHorario) return;
 
-/* EDITAR/EXCLUIR BANHO */
-function gerenciarBanho(b){
-  const escolha=prompt("Digite:\n1 - Editar horário\n2 - Excluir este banho\n3 - Excluir pacote inteiro");
-  if(escolha==="1"){
-    const novo=prompt("Novo horário (HH:MM):",b.horario);
-    if(novo){
-      let banhos=load(LS_BANHOS);
-      banhos=banhos.map(x=>x.id===b.id?{...x,horario:novo}:x);
-      save(LS_BANHOS,banhos);
-    }
-  } else if(escolha==="2"){
-    let banhos=load(LS_BANHOS).filter(x=>x.id!==b.id);
-    save(LS_BANHOS,banhos);
-  } else if(escolha==="3"){
-    let banhos=load(LS_BANHOS).filter(x=>x.pacoteId!==b.pacoteId);
-    save(LS_BANHOS,banhos);
+  let banhos=load(LS_BANHOS);
+  const alvo=banhos.find(x=>x.id===modalBanhoId);
+  if(!alvo) return;
+
+  if(aplicar && alvo.pacoteId){
+    banhos=banhos.map(x=> x.pacoteId===alvo.pacoteId ? {...x, horario:novoHorario} : x);
+  }else{
+    banhos=banhos.map(x=> x.id===alvo.id ? {...x, horario:novoHorario} : x);
   }
+
+  save(LS_BANHOS,banhos);
+  fecharModal();
+  renderCalendario();
+}
+function excluirEsteBanho(){
+  if(!modalBanhoId) return;
+  if(!confirm('Deseja excluir apenas este banho?')) return;
+  let banhos=load(LS_BANHOS).filter(x=>x.id!==modalBanhoId);
+  save(LS_BANHOS,banhos);
+  fecharModal();
+  renderCalendario();
+}
+function excluirPacote(){
+  if(!modalBanhoId) return;
+  let banhos=load(LS_BANHOS);
+  const alvo=banhos.find(x=>x.id===modalBanhoId);
+  if(!alvo || !alvo.pacoteId) return;
+  if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
+  banhos=banhos.filter(x=>x.pacoteId!==alvo.pacoteId);
+  save(LS_BANHOS,banhos);
+  fecharModal();
   renderCalendario();
 }
 
+/* ==================== INICIALIZAÇÃO ==================== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Estado inicial
+  togglePacoteOptions();
+  renderTutores();
+  atualizarTutoresSelect();
+  // Deixa a Agenda pronta (após login ela aparece)
+  renderCalendario();
+});
 </script>
 
 </body>
 </html>
-
-
-
