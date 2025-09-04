@@ -4,155 +4,180 @@
 <meta charset="UTF-8" />
 <title>Estética Animal — Agenda & Tutores</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-<!-- Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Ícones -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
-  :root{
-    --rosa:#ff66a3;
-    --rosa-escuro:#ff3385;
-    --bg:#fff0f6;
-    --card:#ffffff;
-    --texto:#444;
-    --sombra:0 4px 8px rgba(255,102,163,.3);
-    --azul:#0d6efd;
-    --verde:#198754;
-  }
-  body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto);}
-  header{background:var(--rosa); color:#fff; box-shadow:var(--sombra);}
-  header h1{font-size:20px; display:flex; align-items:center; gap:10px; margin:0;}
-  #logoHeader{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+:root{
+  --rosa:#ff66a3;
+  --rosa-escuro:#ff3385;
+  --bg:#fff0f6;
+  --card:#ffffff;
+  --texto:#444;
+  --sombra:0 4px 8px rgba(255,102,163,.3);
+  --azul:#007bff;
+  --verde:#28a745;
+  --cinza:#d6d6d6;
+}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto); margin:0;}
 
-  .mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra);}
-  .mes h2{margin:6px 0 12px; text-transform:capitalize; color:var(--rosa-escuro); text-align:center}
-  .dias-semana{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; text-align:center; font-weight:bold; font-size:12px;}
-  .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
-  .dia{background:#ffe6f0; border-radius:8px; min-height:86px; padding:6px; font-size:12px;}
-  .dia-num{font-weight:bold; opacity:.8}
-  .dia.hoje{outline:2px solid var(--rosa-escuro); background:#ffd1e3}
-  .badge-ag{display:block; width:100%; text-align:left; border:none; border-radius:8px; color:#fff; padding:6px 8px; margin-top:6px; cursor:pointer; font-size:12px;}
-  .badge-ag.avulso{background:var(--azul)}
-  .badge-ag.pacote{background:var(--verde)}
+header{
+  position:fixed; top:0; left:0; right:0; background:var(--rosa); color:#fff; z-index:1000; box-shadow:var(--sombra);
+}
+.header-inner{
+  max-width:1200px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;
+}
+header h1{
+  margin:0; font-size:20px; display:flex; align-items:center; gap:10px;
+}
+#logoHeader{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+nav{display:flex; gap:20px; justify-content:center; align-items:center; flex:1;}
+nav a{display:inline-block; color:#fff; text-decoration:none; font-weight:bold; padding:8px 12px; border-radius:20px; transition:.2s;}
+nav a:hover{background:#fff; color:var(--rosa)}
+nav a.ativo{background:#fff; color:var(--rosa)}
 
-  /* Login */
-  #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.96); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
-  #loginScreen h2{margin-bottom:20px; color:var(--rosa-escuro);}
-  #loginScreen input{width:220px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
-  #loginScreen button{width:100%; max-width:240px; padding:10px; margin-top:12px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
-  #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
-  /* Modal simples */
-  #modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
-  #modal{background:#fff; width:95%; max-width:460px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
-  #modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
-  .modal-row{display:flex; gap:10px; margin:8px 0;}
-  .modal-row > *{flex:1;}
-  .modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
+/* ======= AGENDA ======= */
+#agendaMain{display:flex; gap:20px; align-items:flex-start}
+#calendario{flex:1; max-height:78vh; overflow-y:auto;}
+.mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra); }
+.mes h2{margin:6px 0 12px; text-transform:capitalize; color:var(--rosa-escuro); text-align:center}
+.dias-semana{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; text-align:center; font-weight:bold; font-size:12px;}
+.dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+.dia{background:#ffe6f0; border-radius:8px; min-height:86px; padding:6px; position:relative; font-size:12px;}
+.dia-num{font-weight:bold; opacity:.8}
+.dia.hoje{outline:2px solid var(--rosa-escuro); background:#ffd1e3}
+.badge{display:block; width:100%; text-align:left; border:none; border-radius:8px; color:#fff; padding:6px 8px; margin-top:6px; cursor:pointer; font-size:12px; line-height:1.2; box-shadow:0 2px 6px rgba(0,0,0,.08);}
+.badge.avulso{background:var(--azul)}
+.badge.pacote{background:var(--verde)}
 
-  /* Responsivo: celular = calendário compacto e sidebar abaixo */
-  @media (max-width: 768px){
-    .dia{min-height:64px; padding:4px; font-size:11px;}
-    .dias{gap:4px;}
-    .dias-semana{font-size:11px;}
-    .mes h2{font-size:16px;}
-  }
+#sidebar{width:320px; background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--sombra); position:sticky; top:92px;}
+#sidebar h3{margin-top:0; color:var(--rosa-escuro); text-align:center}
+.field{margin-bottom:10px}
+.field label{display:block; font-size:13px; margin-bottom:4px}
+.field input, .field select{width:100%; padding:10px; border:2px solid var(--rosa); border-radius:10px; background:#fff;}
+.btn{display:inline-block; width:100%; border:none; border-radius:10px; padding:10px 12px; font-weight:bold; cursor:pointer; transition:.2s; box-shadow:var(--sombra);}
+.btn:hover{transform:translateY(-1px)}
+.btn-avulso{background:var(--azul); color:#fff}
+
+/* ======= TUTORES ======= */
+#tutoresSec{display:none; display:grid; grid-template-columns:1fr; gap:20px;}
+#formTutor, #formAnimal, #listaTutores{background:var(--card); padding:16px; border-radius:14px; box-shadow:var(--sombra);}
+#listaTutores h3{margin-top:0; color:var(--rosa-escuro);}
+.tutor-card{border-bottom:1px solid #eee; padding:10px 0; display:flex; flex-direction:column; gap:6px;}
+.tutor-card span{font-size:14px;}
+.animal{display:flex; align-items:center; gap:10px; margin-top:6px; justify-content:space-between;}
+.animal img{width:40px; height:40px; border-radius:50%; object-fit:cover;}
+.edit-icon{cursor:pointer; color:var(--rosa-escuro); margin-left:6px;}
+.edit-icon:hover{color:var(--rosa);}
+
+/* ======= LOGIN ======= */
+#loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
+#loginScreen h2{margin-bottom:14px; color:var(--rosa-escuro);}
+#loginScreen input{width:260px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
+#loginScreen button{width:100%; max-width:280px; padding:10px; margin-top:10px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
+#loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+#loginActions{display:flex; flex-direction:column; gap:8px; width:100%; align-items:center;}
+#loginSmall{margin-top:6px; font-size:12px; opacity:.8; text-align:center;}
+
+/* ======= MODAL ======= */
+#modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
+#modal{background:#fff; width:95%; max-width:420px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+#modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
+.modal-row{display:flex; gap:10px; margin:8px 0;}
+.modal-row > *{flex:1;}
+.modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
+.btn-danger{background:#dc3545; color:#fff;}
+.btn-secondary{background:#6c757d; color:#fff;}
+.small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
 </style>
+
+<!-- Firebase (compat builds para usar firebase.firestore()/auth()) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-<!-- Login -->
 <div id="loginScreen">
   <img src="logo.png" alt="Logo" id="logoLogin">
   <h2>Login Estética Animal</h2>
-  <input type="text" id="loginUser" placeholder="Usuário" />
+  <input type="email" id="loginEmail" placeholder="Email" />
   <input type="password" id="loginPass" placeholder="Senha" />
-  <button onclick="fazerLogin()">Entrar</button>
+  <div id="loginActions">
+    <button onclick="entrar()">Entrar</button>
+    <button onclick="criarConta()">Criar conta</button>
+    <button class="btn btn-secondary" style="background:#6c757d" onclick="resetSenha()">Esqueci a senha</button>
+  </div>
+  <div id="loginSmall">Use email/senha cadastrados. Você pode criar uma conta nova.</div>
 </div>
 
-<!-- Navbar -->
-<header class="py-2">
-  <div class="container d-flex justify-content-between align-items-center">
+<header>
+  <div class="header-inner">
     <h1><img src="logo.png" alt="Logo" id="logoHeader"> Estética Animal</h1>
-    <nav class="d-flex gap-2">
-      <a href="#" id="navAgenda" class="btn btn-sm btn-light" onclick="mostrarAgenda(event)">Agenda</a>
-      <a href="#" id="navTutores" class="btn btn-sm btn-light" onclick="mostrarTutores(event)">Controle de Tutores</a>
+    <nav>
+      <a href="#" id="navAgenda" class="ativo" onclick="mostrarAgenda(event)">Agenda</a>
+      <a href="#" id="navTutores" onclick="mostrarTutores(event)">Controle de Tutores</a>
+      <a href="#" id="navSair" onclick="sair(event)" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
     </nav>
   </div>
 </header>
 
-<main class="container my-4">
+<main>
   <!-- ======= AGENDA ======= -->
-  <section id="agendaMain" class="row">
-    <div class="col-lg-8" id="calendario"></div>
-    <aside class="col-lg-4 mt-3 mt-lg-0">
-      <div class="card shadow-sm p-3">
-        <h3 class="text-center text-primary">Adicionar Banho</h3>
-        <div class="mb-2">
-          <label>Tipo</label>
-          <select id="tipoBanho" class="form-select" onchange="togglePacoteOptions()">
-            <option value="avulso">Avulso</option>
-            <option value="pacote">Pacote</option>
-          </select>
-        </div>
-        <div class="mb-2" id="pacoteOptions" style="display:none">
-          <label>Pacote</label>
-          <select id="pacoteSelecionado" class="form-select">
-            <option value="3">Pacote 3 banhos (1/semana)</option>
-            <option value="4">Pacote 4 banhos (1/semana)</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label>Tutor</label>
-          <select id="tutorSelect" class="form-select" onchange="carregarAnimais()">
-            <option value="">Selecione um tutor</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label>Cliente</label>
-          <select id="animalSelect" class="form-select">
-            <option value="">Selecione um cliente</option>
-          </select>
-        </div>
-        <div class="mb-2"><label>Data</label><input type="date" id="dataBanho" class="form-control"/></div>
-        <div class="mb-2"><label>Horário</label><input type="time" id="horario" class="form-control"/></div>
-        <div class="mb-3"><label>Valor (opcional)</label><input type="number" id="valor" class="form-control" step="0.01" min="0"/></div>
-        <button class="btn btn-primary w-100" onclick="adicionarBanho()">Adicionar</button>
+  <section id="agendaMain">
+    <div id="calendario"></div>
+    <aside id="sidebar">
+      <h3>Adicionar Banho</h3>
+      <div class="field"><label>Tipo</label>
+        <select id="tipoBanho" onchange="togglePacoteOptions()">
+          <option value="avulso">Avulso</option>
+          <option value="pacote">Pacote</option>
+        </select>
       </div>
+      <div class="field" id="pacoteOptions" style="display:none">
+        <label>Pacote</label>
+        <select id="pacoteSelecionado">
+          <option value="3">Pacote 3 banhos (1x por semana / 3 semanas)</option>
+          <option value="4">Pacote 4 banhos (1x por semana / 4 semanas)</option>
+        </select>
+      </div>
+      <div class="field"><label for="tutorSelect">Tutor</label>
+        <select id="tutorSelect" onchange="carregarAnimais()">
+          <option value="">Selecione um tutor</option>
+        </select>
+      </div>
+      <div class="field"><label for="animalSelect">Cliente</label>
+        <select id="animalSelect">
+          <option value="">Selecione um cliente</option>
+        </select>
+      </div>
+      <div class="field"><label for="dataBanho">Data</label><input type="date" id="dataBanho" /></div>
+      <div class="field"><label for="horario">Horário</label><input type="time" id="horario" /></div>
+      <div class="field"><label for="valor">Valor (opcional)</label><input type="number" id="valor" step="0.01" min="0" /></div>
+      <button class="btn btn-avulso" onclick="adicionarBanho()">Adicionar</button>
     </aside>
   </section>
 
-  <!-- ======= TUTORES ======= -->
-  <section id="tutoresSec" style="display:none">
-    <div class="row g-3">
-      <div class="col-md-4">
-        <div class="card p-3 shadow-sm">
-          <h3>Cadastrar Tutor</h3>
-          <input type="text" id="tutorNome" class="form-control mb-2" placeholder="Nome completo">
-          <input type="text" id="tutorEndereco" class="form-control mb-2" placeholder="Endereço">
-          <input type="text" id="tutorTelefone" class="form-control mb-2" placeholder="Telefone">
-          <button class="btn btn-success w-100" onclick="adicionarTutor()">Salvar Tutor</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card p-3 shadow-sm">
-          <h3>Adicionar Cliente</h3>
-          <select id="animalTutor" class="form-select mb-2"></select>
-          <input type="text" id="animalNome" class="form-control mb-2" placeholder="Nome do Cliente">
-          <input type="file" id="animalFoto" class="form-control mb-2" accept="image/*">
-          <button class="btn btn-info w-100" onclick="adicionarAnimal()">Salvar Cliente</button>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card p-3 shadow-sm">
-          <h3>Tutores Registrados</h3>
-          <div id="tutoresContainer"></div>
-        </div>
-      </div>
+  <!-- ======= CONTROLE DE TUTORES ======= -->
+  <section id="tutoresSec">
+    <div id="formTutor">
+      <h3>Cadastrar Tutor</h3>
+      <input type="text" id="tutorNome" placeholder="Nome completo" /><br>
+      <input type="text" id="tutorEndereco" placeholder="Endereço" /><br>
+      <input type="text" id="tutorTelefone" placeholder="Telefone" /><br>
+      <button class="btn btn-avulso" onclick="adicionarTutor()">Salvar Tutor</button>
+    </div>
+    <div id="formAnimal">
+      <h3>Adicionar Cliente</h3>
+      <select id="animalTutor"></select><br>
+      <input type="text" id="animalNome" placeholder="Nome do Cliente" /><br>
+      <input type="file" id="animalFoto" accept="image/*" /><br>
+      <button class="btn btn-avulso" onclick="adicionarAnimal()">Salvar Cliente</button>
+    </div>
+    <div id="listaTutores">
+      <h3>Tutores Registrados</h3>
+      <div id="tutoresContainer"></div>
     </div>
   </section>
 </main>
@@ -161,22 +186,22 @@
 <div id="modalOverlay">
   <div id="modal">
     <h3>Gerenciar Agendamento</h3>
-    <div class="small text-center mb-2" id="modalInfo"></div>
+    <div class="small" id="modalInfo"></div>
     <div class="modal-row">
       <div>
         <label>Horário</label>
-        <input type="time" id="modalHorario" class="form-control">
+        <input type="time" id="modalHorario">
       </div>
       <div>
         <label>Aplicar ao pacote?</label>
-        <select id="modalAplicarPacote" class="form-select">
+        <select id="modalAplicarPacote">
           <option value="nao">Não</option>
           <option value="sim">Sim</option>
         </select>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="salvarEdicaoBanho()">Salvar alterações</button>
+      <button class="btn btn-avulso" onclick="salvarEdicaoBanho()">Salvar alterações</button>
       <button class="btn btn-danger" onclick="excluirEsteBanho()">Excluir apenas este</button>
       <button class="btn btn-danger" id="btnExcluirPacote" style="display:none" onclick="excluirPacote()">Excluir pacote inteiro</button>
       <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
@@ -184,14 +209,8 @@
   </div>
 </div>
 
-<!-- ==================== APP (Módulo) ==================== -->
-<script type="module">
-/* ========= Firebase ========= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore, collection, doc, getDocs, getDoc, setDoc, addDoc, deleteDoc, query, where
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+<script>
+/* ==================== FIREBASE INIT ==================== */
 const firebaseConfig = {
   apiKey: "AIzaSyCcZ-Gt1XqLxRLYI1CnwsqG_2gdyDyHhyI",
   authDomain: "estetica-animal.firebaseapp.com",
@@ -200,307 +219,109 @@ const firebaseConfig = {
   messagingSenderId: "634118247526",
   appId: "1:634118247526:web:1255d3c25f660f66b589a7"
 };
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-/* ========= Utils ========= */
-const pad2 = n => String(n).padStart(2,'0');
-const toYMD = (y,m,d) => `${y}-${pad2(m)}-${pad2(d)}`;
+/* ==================== UTIL / HELPERS ==================== */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+// datas locais (evita fuso)
+const pad2=n=>String(n).padStart(2,'0');
+const toYMD=(y,m,d)=>`${y}-${pad2(m)}-${pad2(d)}`;
 function addDaysYMD(ymd, days){
   const [Y,M,D]=ymd.split('-').map(Number);
-  const dt=new Date(Y, M-1, D+days); // local (sem UTC) => evita “dia anterior”
+  const dt=new Date(Y, M-1, D+days);
   return toYMD(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
 }
-const uidLocal = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
-/* ========= Estado / Cache ========= */
-let cacheTutores = [];           // [{id, nome, endereco, tel}]
-let cacheAnimaisPorTutor = {};   // { [tutorId]: [{id, nome, foto}] }
-let mapAnimalNome = new Map();   // animalId -> nome
-let modalBanhoId = null;
+/* ==================== AUTH ==================== */
+async function entrar(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){ alert('Informe email e senha'); return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(e){
+    alert('Falha no login: '+(e.message||e));
+  }
+}
+async function criarConta(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){ alert('Informe email e senha'); return; }
+  try{
+    await auth.createUserWithEmailAndPassword(email, pass);
+    alert('Conta criada com sucesso!');
+  }catch(e){
+    alert('Erro ao criar conta: '+(e.message||e));
+  }
+}
+async function resetSenha(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!email){ alert('Informe o email para recuperar a senha'); return; }
+  try{
+    await auth.sendPasswordResetEmail(email);
+    alert('Email de recuperação enviado.');
+  }catch(e){
+    alert('Erro ao enviar recuperação: '+(e.message||e));
+  }
+}
+async function sair(e){
+  if(e) e.preventDefault();
+  await auth.signOut();
+}
 
-/* ========= Login ========= */
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-// Inicializa o auth
-const auth = getAuth(app);
-
-async function fazerLogin() {
-  const email = document.getElementById("loginUser").value.trim();
-  const senha = document.getElementById("loginPass").value.trim();
-
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, senha);
-    console.log("Login bem-sucedido:", userCredential.user);
-    document.getElementById("loginScreen").style.display = "none";
+auth.onAuthStateChanged(async (user)=>{
+  if(user){
+    document.getElementById('loginScreen').style.display='none';
     mostrarAgenda();
-  } catch (error) {
-    console.error(error);
-    alert("Usuário ou senha incorretos no Firebase.");
+    await refreshCacheTutores();
+    await renderCalendario();
+  }else{
+    document.getElementById('loginScreen').style.display='flex';
   }
-};
+});
 
-/* ========= Navegação ========= */
-window.setAtivo = function(id){
-  document.querySelectorAll('header nav a').forEach(a=>a.classList.remove('btn-dark'));
-  document.getElementById(id).classList.add('btn-dark');
-};
-window.mostrarAgenda = function(e){
-  if(e) e.preventDefault();
-  document.getElementById('agendaMain').style.display='flex';
-  document.getElementById('tutoresSec').style.display='none';
-  setAtivo('navAgenda');
-  renderCalendario();
-};
-window.mostrarTutores = function(e){
-  if(e) e.preventDefault();
-  document.getElementById('agendaMain').style.display='none';
-  document.getElementById('tutoresSec').style.display='block';
-  setAtivo('navTutores');
-  renderTutoresUI();
-};
+/* ==================== NAV ==================== */
+function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));document.getElementById(id).classList.add('ativo');}
+function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');}
+async function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');await renderTutores();}
 
-/* ========= Firestore: Tutores & Animais ========= */
-async function carregarTutoresEAnimais(){
-  cacheTutores = [];
-  cacheAnimaisPorTutor = {};
-  mapAnimalNome.clear();
-
-  const snapT = await getDocs(collection(db,'tutores'));
-  snapT.forEach(docu=>{
-    cacheTutores.push({ id:docu.id, ...docu.data() });
-  });
-  // ordena por nome
-  cacheTutores.sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
-
-  // carrega subcoleções de animais
-  for(const t of cacheTutores){
-    const subSnap = await getDocs(collection(db,'tutores', t.id, 'animais'));
-    cacheAnimaisPorTutor[t.id] = [];
-    subSnap.forEach(d=>{
-      const animal = { id:d.id, ...d.data() };
-      cacheAnimaisPorTutor[t.id].push(animal);
-      mapAnimalNome.set(animal.id, animal.nome || 'Cliente');
-    });
-    cacheAnimaisPorTutor[t.id].sort((a,b)=> (a.nome||'').localeCompare(b.nome||''));
+/* ==================== CACHE TUTORES/ANIMAIS ==================== */
+let TUTORES_CACHE=[]; // [{id,nome,endereco,tel,animais:[{id,nome,foto}]}]
+async function refreshCacheTutores(){
+  const tutSnap=await db.collection('tutores').get();
+  const arr=[];
+  for(const doc of tutSnap.docs){
+    const t={id:doc.id, ...doc.data(), animais:[]};
+    const aniSnap=await db.collection('tutores').doc(doc.id).collection('animais').get();
+    aniSnap.forEach(a=> t.animais.push({id:a.id, ...a.data()}));
+    arr.push(t);
   }
+  TUTORES_CACHE=arr;
+  await atualizarTutoresSelect();
 }
 
-function renderTutoresUI(){
-  // Preenche selects
-  const selTutor = document.getElementById('tutorSelect');
-  const selTutorAnimal = document.getElementById('animalTutor');
-  selTutor.innerHTML = '<option value="">Selecione um tutor</option>';
-  selTutorAnimal.innerHTML = '<option value="">Selecione um Tutor</option>';
-  cacheTutores.forEach(t=>{
-    selTutor.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
-    selTutorAnimal.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
-  });
-
-  // Lista lateral
-  const container = document.getElementById('tutoresContainer');
-  container.innerHTML = '';
-  cacheTutores.forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'border-bottom pb-2 mb-2';
-    card.innerHTML = `<strong>${t.nome||'-'}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
-
-    const btnDel = document.createElement('button');
-    btnDel.className = 'btn btn-sm btn-outline-danger ms-2';
-    btnDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
-    btnDel.onclick = ()=> excluirTutor(t.id);
-
-    card.appendChild(btnDel);
-
-    (cacheAnimaisPorTutor[t.id]||[]).forEach(a=>{
-      const row = document.createElement('div');
-      row.className='d-flex align-items-center justify-content-between mt-2';
-      row.innerHTML = `<div class="d-flex align-items-center gap-2">
-        ${a.foto?`<img src="${a.foto}" style="width:36px;height:36px;border-radius:50%;object-fit:cover">`:''}
-        <span>${a.nome}</span>
-      </div>`;
-      const btnDelA = document.createElement('button');
-      btnDelA.className='btn btn-sm btn-outline-danger';
-      btnDelA.innerHTML='<i class="fa-solid fa-trash"></i>';
-      btnDelA.onclick=()=> excluirAnimal(t.id, a.id);
-      row.appendChild(btnDelA);
-      card.appendChild(row);
-    });
-
-    container.appendChild(card);
-  });
-}
-
-window.adicionarTutor = async function(){
-  const nome=document.getElementById('tutorNome').value.trim();
-  const endereco=document.getElementById('tutorEndereco').value.trim();
-  const tel=document.getElementById('tutorTelefone').value.trim();
-  if(!nome) return alert('Informe o nome do tutor.');
-  await addDoc(collection(db,'tutores'), {nome, endereco, tel});
-  document.getElementById('tutorNome').value='';
-  document.getElementById('tutorEndereco').value='';
-  document.getElementById('tutorTelefone').value='';
-  await carregarTutoresEAnimais();
-  renderTutoresUI();
-  carregarAnimais(); // atualiza select da agenda
-};
-
-window.adicionarAnimal = async function(){
-  const tutorId=document.getElementById('animalTutor').value;
-  const nome=document.getElementById('animalNome').value.trim();
-  const file=document.getElementById('animalFoto').files[0];
-  if(!tutorId) return alert('Selecione um tutor');
-  if(!nome) return alert('Informe o nome do cliente');
-
-  let fotoData = '';
-  if(file){
-    fotoData = await new Promise((resolve)=>{
-      const r=new FileReader();
-      r.onload = e=> resolve(e.target.result);
-      r.readAsDataURL(file);
-    });
-  }
-  await addDoc(collection(db,'tutores', tutorId, 'animais'), {nome, foto: fotoData});
-  document.getElementById('animalNome').value='';
-  document.getElementById('animalFoto').value='';
-  await carregarTutoresEAnimais();
-  renderTutoresUI();
-  carregarAnimais(); // atualiza select da agenda
-};
-
-async function excluirTutor(tutorId){
-  if(!confirm('Excluir este tutor e todos os clientes vinculados?')) return;
-  // apaga subcoleção de animais
-  const snapAnim = await getDocs(collection(db,'tutores', tutorId, 'animais'));
-  for(const a of snapAnim.docs){
-    await deleteDoc(doc(db,'tutores', tutorId, 'animais', a.id));
-  }
-  // apaga o tutor
-  await deleteDoc(doc(db,'tutores', tutorId));
-  // apaga banhos vinculados ao tutor
-  const snapBanhos = await getDocs(collection(db,'banhos'));
-  for(const b of snapBanhos.docs){
-    if(b.data().tutorId === tutorId){
-      await deleteDoc(doc(db,'banhos', b.id));
-    }
-  }
-  await carregarTutoresEAnimais();
-  renderTutoresUI();
-  renderCalendario();
-}
-
-async function excluirAnimal(tutorId, animalId){
-  if(!confirm('Excluir este cliente?')) return;
-  await deleteDoc(doc(db,'tutores', tutorId, 'animais', animalId));
-  // remove banhos deste animal
-  const snapBanhos = await getDocs(collection(db,'banhos'));
-  for(const b of snapBanhos.docs){
-    if(b.data().animalId === animalId){
-      await deleteDoc(doc(db,'banhos', b.id));
-    }
-  }
-  await carregarTutoresEAnimais();
-  renderTutoresUI();
-  carregarAnimais();
-  renderCalendario();
-}
-
-window.carregarAnimais = function(){
-  const tutorId=document.getElementById('tutorSelect').value;
-  const sel=document.getElementById('animalSelect');
-  sel.innerHTML='<option value="">Selecione um cliente</option>';
-  (cacheAnimaisPorTutor[tutorId]||[]).forEach(a=>{
-    sel.innerHTML += `<option value="${a.id}">${a.nome}</option>`;
-  });
-};
-
-/* ========= Firestore: Banhos / Agenda ========= */
-function getAnimalNome(animalId){
-  return mapAnimalNome.get(animalId) || 'Cliente';
-}
-
-window.togglePacoteOptions = function(){
-  const tipo=document.getElementById('tipoBanho').value;
-  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
-};
-
-window.adicionarBanho = async function(){
-  const tipo=document.getElementById('tipoBanho').value;
-  const tutorId=document.getElementById('tutorSelect').value;
-  const animalId=document.getElementById('animalSelect').value;
-  const data=document.getElementById('dataBanho').value; // YYYY-MM-DD (string)
-  const horario=document.getElementById('horario').value;
-  const valor=document.getElementById('valor').value || '';
-
-  if(!tutorId || !animalId || !data || !horario){
-    alert('Preencha tutor, cliente, data e horário.');
-    return;
-  }
-
-  const pacoteId = (tipo==='pacote') ? uidLocal() : null;
-
-  if(tipo==='avulso'){
-    await addDoc(collection(db,'banhos'), { tipo, tutorId, animalId, data, horario, valor, pacoteId:null });
-  } else {
-    const qtd = parseInt(document.getElementById('pacoteSelecionado').value,10);
-    let atual = data;
-    for(let i=0;i<qtd;i++){
-      if(i>0) atual = addDaysYMD(atual, 7); // sempre +7d a partir da string anterior (sem UTC)
-      await addDoc(collection(db,'banhos'), { tipo, tutorId, animalId, data:atual, horario, valor, pacoteId });
-    }
-  }
-
-  // limpar e recarregar
-  document.getElementById('tipoBanho').value='avulso';
-  togglePacoteOptions();
-  document.getElementById('tutorSelect').value='';
-  carregarAnimais();
-  document.getElementById('dataBanho').value='';
-  document.getElementById('horario').value='';
-  document.getElementById('valor').value='';
-
-  await renderCalendario();
-};
-
-/* ========= Calendário ========= */
-async function listarBanhosPeriodo(startYMD, endYMD){
-  // Simples: carrega todos e filtra no cliente (evita problemas de índice)
-  const snap = await getDocs(collection(db,'banhos'));
-  const itens = [];
-  snap.forEach(d=>{
-    const b = { id:d.id, ...d.data() };
-    if(b.data >= startYMD && b.data <= endYMD){
-      itens.push(b);
-    }
-  });
-  return itens;
-}
-
-window.renderCalendario = async function(){
+/* ==================== CALENDÁRIO ==================== */
+async function renderCalendario(){
   const calendario=document.getElementById('calendario');
   calendario.innerHTML='';
+
+  // carrega TODOS os banhos (simples). Em produção: filtrar por intervalo.
+  const banhosSnap=await db.collection('banhos').get();
+  const banhos=banhosSnap.docs.map(d=>({id:d.id, ...d.data()}));
+
+  const porData=new Map();
+  for(const b of banhos){
+    if(!porData.has(b.data)) porData.set(b.data,[]);
+    porData.get(b.data).push(b);
+  }
 
   const hoje=new Date();
   const baseAno=hoje.getFullYear();
   const baseMes=hoje.getMonth();
 
-  const mostrarMeses = window.innerWidth < 768 ? 1 : 2;
-
-  // Determina intervalo completo para buscar todos os banhos (ex: 2 meses)
-  const start = new Date(baseAno, baseMes, 1);
-  const end   = new Date(baseAno, baseMes + (mostrarMeses-1) + 1, 0); // último dia do último mês mostrado
-  const startYMD = toYMD(start.getFullYear(), start.getMonth()+1, 1);
-  const endYMD   = toYMD(end.getFullYear(),   end.getMonth()+1,   end.getDate());
-
-  const banhosPeriodo = await listarBanhosPeriodo(startYMD, endYMD);
-  // indexa por data
-  const porData = new Map();
-  for(const b of banhosPeriodo){
-    if(!porData.has(b.data)) porData.set(b.data, []);
-    porData.get(b.data).push(b);
-  }
-
-  for(let offset=0; offset<mostrarMeses; offset++){
+  for(let offset=0; offset<2; offset++){
     const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1);
     const ano=primeiroDiaMes.getFullYear();
     const mes=primeiroDiaMes.getMonth();
@@ -517,16 +338,14 @@ window.renderCalendario = async function(){
     const grid=document.createElement('div');
     grid.className='dias';
 
-    // segunda→domingo (getDay 0=Dom → segunda=0)
+    // Segunda a domingo
     const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
     for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
     for(let d=1; d<=diasNoMes; d++){
       const cell=document.createElement('div');
       cell.className='dia';
-      if(offset===0 && d===hoje.getDate() && mes===hoje.getMonth() && ano===hoje.getFullYear()){
-        cell.classList.add('hoje');
-      }
+      if(offset===0 && d===hoje.getDate()) cell.classList.add('hoje');
 
       const num=document.createElement('div');
       num.className='dia-num';
@@ -535,13 +354,11 @@ window.renderCalendario = async function(){
 
       const dayStr=toYMD(ano, mes+1, d);
       const lista=porData.get(dayStr)||[];
-      // ordena por horário simples (HH:MM)
-      lista.sort((a,b)=> (a.horario||'').localeCompare(b.horario||''));
-
+      lista.sort((a,b)=> a.horario.localeCompare(b.horario));
       for(const b of lista){
         const btn=document.createElement('button');
-        btn.className='badge-ag '+(b.tipo==='pacote'?'pacote':'avulso');
-        btn.textContent=`${getAnimalNome(b.animalId)} — ${b.horario}`;
+        btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
+        btn.textContent=`${getAnimalNome(b.tutorId,b.animalId)} — ${b.horario}`;
         btn.onclick=()=>abrirModal(b.id);
         cell.appendChild(btn);
       }
@@ -552,93 +369,258 @@ window.renderCalendario = async function(){
     mesDiv.appendChild(grid);
     calendario.appendChild(mesDiv);
   }
-};
+}
 
-/* ========= Modal: editar / excluir ========= */
-window.abrirModal = async function(banhoId){
-  modalBanhoId = banhoId;
-  const bDoc = await getDoc(doc(db,'banhos', banhoId));
-  if(!bDoc.exists()) return;
-  const b = bDoc.data();
-  document.getElementById('modalInfo').textContent =
-    `${getAnimalNome(b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
-  document.getElementById('modalHorario').value = b.horario || '';
-  document.getElementById('modalAplicarPacote').value='nao';
-  document.getElementById('btnExcluirPacote').style.display = b.pacoteId ? 'block' : 'none';
-  document.getElementById('modalOverlay').style.display='flex';
-};
-window.fecharModal = function(){
-  document.getElementById('modalOverlay').style.display='none';
-  modalBanhoId = null;
-};
-window.salvarEdicaoBanho = async function(){
-  const novoHorario = (document.getElementById('modalHorario').value || '').trim();
-  const aplicar     = document.getElementById('modalAplicarPacote').value === 'sim';
-  if(!modalBanhoId || !novoHorario) return;
+/* ==================== TUTORES / CLIENTES ==================== */
+async function adicionarTutor(){
+  const nome=document.getElementById('tutorNome').value.trim();
+  const endereco=document.getElementById('tutorEndereco').value.trim();
+  const tel=document.getElementById('tutorTelefone').value.trim();
+  if(!nome) return alert('Informe o nome');
 
-  const alvoDoc = await getDoc(doc(db,'banhos', modalBanhoId));
-  if(!alvoDoc.exists()) return;
-  const alvo = alvoDoc.data();
+  const docRef=await db.collection('tutores').add({nome,endereco,tel});
+  document.getElementById('tutorNome').value='';
+  document.getElementById('tutorEndereco').value='';
+  document.getElementById('tutorTelefone').value='';
+  await refreshCacheTutores();
+  await renderTutores();
+}
+async function adicionarAnimal(){
+  const tutorId=document.getElementById('animalTutor').value;
+  const nome=document.getElementById('animalNome').value.trim();
+  const file=document.getElementById('animalFoto').files[0];
+  if(!tutorId) return alert('Selecione um tutor');
+  if(!nome) return alert('Informe o nome do cliente');
 
-  if(aplicar && alvo.pacoteId){
-    // aplica em todos do pacote
-    const snap = await getDocs(collection(db,'banhos'));
-    const ops = [];
-    for(const d of snap.docs){
-      const x = d.data();
-      if(x.pacoteId === alvo.pacoteId){
-        ops.push(setDoc(doc(db,'banhos', d.id), {...x, horario: novoHorario}));
-      }
-    }
-    await Promise.all(ops);
+  let foto='';
+  if(file){
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      foto=e.target.result;
+      await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
+      document.getElementById('animalNome').value='';
+      document.getElementById('animalFoto').value='';
+      await refreshCacheTutores();
+      await renderTutores();
+      await atualizarTutoresSelect();
+    };
+    reader.readAsDataURL(file);
   } else {
-    await setDoc(doc(db,'banhos', modalBanhoId), {...alvo, horario: novoHorario});
+    await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
+    document.getElementById('animalNome').value='';
+    document.getElementById('animalFoto').value='';
+    await refreshCacheTutores();
+    await renderTutores();
+    await atualizarTutoresSelect();
   }
-  fecharModal();
-  await renderCalendario();
-};
-window.excluirEsteBanho = async function(){
-  if(!modalBanhoId) return;
-  if(!confirm('Deseja excluir apenas este banho?')) return;
-  await deleteDoc(doc(db,'banhos', modalBanhoId));
-  fecharModal();
-  await renderCalendario();
-};
-window.excluirPacote = async function(){
-  if(!modalBanhoId) return;
-  const alvoDoc = await getDoc(doc(db,'banhos', modalBanhoId));
-  if(!alvoDoc.exists()) return;
-  const alvo = alvoDoc.data();
-  if(!alvo.pacoteId) return;
-  if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
+}
+async function renderTutores(){
+  const container=document.getElementById('tutoresContainer');
+  const sel=document.getElementById('animalTutor');
+  container.innerHTML='';
+  sel.innerHTML='<option value="">Selecione um Tutor</option>';
 
-  const snap = await getDocs(collection(db,'banhos'));
-  const ops = [];
-  for(const d of snap.docs){
-    const x = d.data();
-    if(x.pacoteId === alvo.pacoteId){
-      ops.push(deleteDoc(doc(db,'banhos', d.id)));
-    }
+  for(const t of TUTORES_CACHE){
+    sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
+    const div=document.createElement('div');
+    div.className='tutor-card';
+    div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
+
+    const btnExcluir=document.createElement('i');
+    btnExcluir.className="fa-solid fa-trash edit-icon";
+    btnExcluir.title='Excluir tutor';
+    btnExcluir.onclick=()=>excluirTutor(t.id);
+    div.appendChild(btnExcluir);
+
+    t.animais.forEach(a=>{
+      const an=document.createElement('div');
+      an.className='animal';
+      an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
+      const delAni=document.createElement('i');
+      delAni.className="fa-solid fa-trash edit-icon";
+      delAni.title='Excluir cliente';
+      delAni.onclick=()=>excluirAnimal(t.id,a.id);
+      an.appendChild(delAni);
+      div.appendChild(an);
+    });
+
+    container.appendChild(div);
   }
-  await Promise.all(ops);
-  fecharModal();
-  await renderCalendario();
-};
+}
+async function atualizarTutoresSelect(){
+  const sel=document.getElementById('tutorSelect');
+  sel.innerHTML='<option value="">Selecione um tutor</option>';
+  TUTORES_CACHE.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
+  await carregarAnimais();
+}
+async function carregarAnimais(){
+  const tutorId=document.getElementById('tutorSelect').value;
+  const sel=document.getElementById('animalSelect');
+  sel.innerHTML='<option value="">Selecione um cliente</option>';
+  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
+  if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
+}
+function getAnimalNome(tutorId, animalId){
+  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
+  if(!t) return 'Cliente';
+  const a=t.animais.find(x=>x.id===animalId);
+  return a? a.nome : 'Cliente';
+}
+async function excluirTutor(tutorId){
+  if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
+  // apaga subcoleção animais
+  const aniSnap=await db.collection('tutores').doc(tutorId).collection('animais').get();
+  const batch=db.batch();
+  aniSnap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
 
-/* ========= Carregamento inicial ========= */
-async function carregarTudo(){
-  await carregarTutoresEAnimais();
-  renderTutoresUI();
-  carregarAnimais();
+  // apaga banhos do tutor
+  const banhosSnap=await db.collection('banhos').where('tutorId','==',tutorId).get();
+  const batch2=db.batch();
+  banhosSnap.forEach(doc=> batch2.delete(doc.ref));
+  await batch2.commit();
+
+  // apaga tutor
+  await db.collection('tutores').doc(tutorId).delete();
+
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
+  await renderCalendario();
+}
+async function excluirAnimal(tutorId, animalId){
+  if(!confirm('Excluir este cliente e banhos vinculados?')) return;
+  await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
+
+  // remove banhos deste animal
+  const banhosSnap=await db.collection('banhos').where('animalId','==',animalId).get();
+  const batch=db.batch();
+  banhosSnap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
+
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
   await renderCalendario();
 }
 
-// Render inicial básico (antes do login só monta estrutura visual)
-document.addEventListener('DOMContentLoaded', ()=>{
+/* ==================== BANHOS ==================== */
+function togglePacoteOptions(){
+  const tipo=document.getElementById('tipoBanho').value;
+  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
+}
+
+async function adicionarBanho(){
+  const tipo=document.getElementById('tipoBanho').value;
+  const tutorId=document.getElementById('tutorSelect').value;
+  const animalId=document.getElementById('animalSelect').value;
+  const data=document.getElementById('dataBanho').value; // YYYY-MM-DD
+  const horario=document.getElementById('horario').value;
+  const valor=document.getElementById('valor').value || '';
+
+  if(!tutorId || !animalId || !data || !horario){
+    alert('Preencha tutor, cliente, data e horário.');
+    return;
+  }
+
+  const pacoteId = (tipo==='pacote') ? uid() : null;
+
+  if(tipo==='avulso'){
+    const banho = { tipo, tutorId, animalId, data, horario, valor, pacoteId:null };
+    await db.collection('banhos').add(banho);
+  } else {
+    const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
+    let atual=data;
+    for(let i=0;i<qtd;i++){
+      if(i>0) atual = addDaysYMD(atual, 7);
+      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, pacoteId };
+      await db.collection('banhos').add(banho);
+    }
+  }
+
+  await renderCalendario();
+
+  // limpa campos
+  document.getElementById('tipoBanho').value='avulso';
   togglePacoteOptions();
-  renderCalendario();
+  document.getElementById('tutorSelect').value='';
+  await carregarAnimais();
+  document.getElementById('dataBanho').value='';
+  document.getElementById('horario').value='';
+  document.getElementById('valor').value='';
+}
+
+/* ==================== MODAL: editar/excluir ==================== */
+let modalBanhoId=null;
+async function abrirModal(banhoId){
+  modalBanhoId=banhoId;
+  const ref=db.collection('banhos').doc(banhoId);
+  const b=(await ref.get()).data();
+  if(!b) return;
+
+  const info = `${getAnimalNome(b.tutorId,b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
+  document.getElementById('modalInfo').textContent=info;
+  document.getElementById('modalHorario').value=b.horario;
+  document.getElementById('modalAplicarPacote').value='nao';
+  document.getElementById('btnExcluirPacote').style.display = (b.pacoteId) ? 'block':'none';
+
+  document.getElementById('modalOverlay').style.display='flex';
+}
+function fecharModal(){
+  document.getElementById('modalOverlay').style.display='none';
+  modalBanhoId=null;
+}
+async function salvarEdicaoBanho(){
+  const novoHorario=document.getElementById('modalHorario').value;
+  const aplicar=document.getElementById('modalAplicarPacote').value==='sim';
+  if(!modalBanhoId || !novoHorario) return;
+
+  const alvoRef=db.collection('banhos').doc(modalBanhoId);
+  const alvoSnap=await alvoRef.get();
+  const alvo=alvoSnap.data();
+  if(!alvo) return;
+
+  if(aplicar && alvo.pacoteId){
+    const snap=await db.collection('banhos').where('pacoteId','==',alvo.pacoteId).get();
+    const batch=db.batch();
+    snap.forEach(doc=> batch.update(doc.ref,{horario:novoHorario}));
+    await batch.commit();
+  }else{
+    await alvoRef.update({horario:novoHorario});
+  }
+
+  fecharModal();
+  await renderCalendario();
+}
+async function excluirEsteBanho(){
+  if(!modalBanhoId) return;
+  if(!confirm('Deseja excluir apenas este banho?')) return;
+  await db.collection('banhos').doc(modalBanhoId).delete();
+  fecharModal();
+  await renderCalendario();
+}
+async function excluirPacote(){
+  if(!modalBanhoId) return;
+  const alvo=await db.collection('banhos').doc(modalBanhoId).get();
+  const b=alvo.data();
+  if(!b || !b.pacoteId) return;
+  if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
+
+  const snap=await db.collection('banhos').where('pacoteId','==',b.pacoteId).get();
+  const batch=db.batch();
+  snap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
+
+  fecharModal();
+  await renderCalendario();
+}
+
+/* ==================== INICIALIZAÇÃO ==================== */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  togglePacoteOptions();
+  // A UI será liberada após login (onAuthStateChanged).
 });
 </script>
+
 </body>
 </html>
-
