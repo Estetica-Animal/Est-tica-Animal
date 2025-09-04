@@ -218,6 +218,12 @@ footer{
 <footer>Versão 1.0.0</footer>
 
 <script>
+  // Expor funções para o HTML conseguir chamar
+window.entrar = entrar;
+window.criarConta = criarConta;
+window.resetSenha = resetSenha;
+window.sair = sair;
+
 /* ==================== FIREBASE INIT ==================== */
 const firebaseConfig = {
   apiKey: "AIzaSyCcZ-Gt1XqLxRLYI1CnwsqG_2gdyDyHhyI",
@@ -269,3 +275,7 @@ async function resetSenha(){
 async function sair(e){ if(e) e.preventDefault(); await auth.signOut(); }
 
 auth.onAuth
+  </script>
+</body>
+</html>
+
