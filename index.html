@@ -339,7 +339,7 @@ function adicionarBanho(){
   const tipo=document.getElementById('tipoBanho').value;
   const tutorId=document.getElementById('tutorSelect').value;
   const animalId=document.getElementById('animalSelect').value;
-  const data=document.getElementById('dataBanho').value;
+  const data=document.getElementById('dataBanho').value; // já vem como YYYY-MM-DD
   const horario=document.getElementById('horario').value;
   const valor=document.getElementById('valor').value;
 
@@ -352,11 +352,11 @@ function adicionarBanho(){
     banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data,horario,valor});
   } else {
     const qtd=parseInt(document.getElementById('pacoteSelecionado').value);
-    let dt=new Date(data+"T00:00"); // força meia-noite local
+    let [ano,mes,dia]=data.split("-").map(Number);
     for(let i=0;i<qtd;i++){
-      const str=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+      const d=new Date(ano,mes-1,dia+(i*7)); // aqui só usamos Date p/ somar semanas
+      const str=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       banhos.push({id:uid(),pacoteId,tipo,tutorId,animalId,data:str,horario,valor});
-      dt.setDate(dt.getDate()+7); // próximo banho semanal
     }
   }
   save(LS_BANHOS,banhos);
@@ -367,6 +367,7 @@ function adicionarBanho(){
   document.getElementById('horario').value='';
   document.getElementById('valor').value='';
 }
+
 
 /* RENDERIZA BANHOS NO CALENDÁRIO */
 function renderCalendario(){
@@ -414,7 +415,9 @@ function renderCalendario(){
         btn.innerText=`${buscarAnimal(b.animalId)}\n${b.horario}`;
         btn.onclick=()=>gerenciarBanho(b);
         cell.appendChild(btn);
-      });
+banhos.filter(b=>b.data===dataStr).forEach(b=>{
+   // mostra no calendário
+});
 
       grid.appendChild(cell);
     }
@@ -457,5 +460,6 @@ function gerenciarBanho(b){
 
 </body>
 </html>
+
 
 
