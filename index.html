@@ -40,7 +40,7 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 /* ======= AGENDA ======= */
 #agendaMain{display:flex; gap:20px; align-items:flex-start}
 #calendario{flex:1; max-height:78vh; overflow-y:auto;}
-.mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra);}
+.mes{background:var(--card); border-radius:14px; padding:12px; margin-bottom:20px; box-shadow:var(--sombra); }
 .mes h2{margin:6px 0 12px; text-transform:capitalize; color:var(--rosa-escuro); text-align:center}
 .dias-semana{display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:6px; text-align:center; font-weight:bold; font-size:12px;}
 .dias{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
@@ -73,10 +73,12 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
 /* ======= LOGIN ======= */
 #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
-#loginScreen h2{margin-bottom:20px; color:var(--rosa-escuro);}
-#loginScreen input{width:220px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
-#loginScreen button{width:100%; max-width:240px; padding:10px; margin-top:12px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
+#loginScreen h2{margin-bottom:14px; color:var(--rosa-escuro);}
+#loginScreen input{width:260px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
+#loginScreen button{width:100%; max-width:280px; padding:10px; margin-top:10px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
 #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
+#loginActions{display:flex; flex-direction:column; gap:8px; width:100%; align-items:center;}
+#loginSmall{margin-top:6px; font-size:12px; opacity:.8; text-align:center;}
 
 /* ======= MODAL ======= */
 #modalOverlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
@@ -89,15 +91,25 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 .btn-secondary{background:#6c757d; color:#fff;}
 .small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
 </style>
+
+<!-- Firebase (compat builds para usar firebase.firestore()/auth()) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
 </head>
 <body>
 
 <div id="loginScreen">
   <img src="logo.png" alt="Logo" id="logoLogin">
   <h2>Login Estética Animal</h2>
-  <input type="text" id="loginUser" placeholder="Usuário" />
+  <input type="email" id="loginEmail" placeholder="Email" />
   <input type="password" id="loginPass" placeholder="Senha" />
-  <button onclick="fazerLogin()">Entrar</button>
+  <div id="loginActions">
+    <button onclick="entrar()">Entrar</button>
+    <button onclick="criarConta()">Criar conta</button>
+    <button class="btn btn-secondary" style="background:#6c757d" onclick="resetSenha()">Esqueci a senha</button>
+  </div>
+  <div id="loginSmall">Use email/senha cadastrados. Você pode criar uma conta nova.</div>
 </div>
 
 <header>
@@ -106,6 +118,7 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
     <nav>
       <a href="#" id="navAgenda" class="ativo" onclick="mostrarAgenda(event)">Agenda</a>
       <a href="#" id="navTutores" onclick="mostrarTutores(event)">Controle de Tutores</a>
+      <a href="#" id="navSair" onclick="sair(event)" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
     </nav>
   </div>
 </header>
@@ -197,69 +210,121 @@ main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 </div>
 
 <script>
-/* ==================== UTIL / STORAGE ==================== */
-const LS_TUTORES='tutores';
-const LS_BANHOS='banhos';
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const load=(k)=>JSON.parse(localStorage.getItem(k)||'[]');
-const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+/* ==================== FIREBASE INIT ==================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyCcZ-Gt1XqLxRLYI1CnwsqG_2gdyDyHhyI",
+  authDomain: "estetica-animal.firebaseapp.com",
+  projectId: "estetica-animal",
+  storageBucket: "estetica-animal.appspot.com",
+  messagingSenderId: "634118247526",
+  appId: "1:634118247526:web:1255d3c25f660f66b589a7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-/* Helpers de data SEM fuso/UTC (sempre string YYYY-MM-DD) */
+/* ==================== UTIL / HELPERS ==================== */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+// datas locais (evita fuso)
 const pad2=n=>String(n).padStart(2,'0');
 const toYMD=(y,m,d)=>`${y}-${pad2(m)}-${pad2(d)}`;
 function addDaysYMD(ymd, days){
   const [Y,M,D]=ymd.split('-').map(Number);
-  const dt=new Date(Y, M-1, D+days); // construtor local, evita UTC
+  const dt=new Date(Y, M-1, D+days);
   return toYMD(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
 }
 
-/* ==================== LOGIN ==================== */
-const usuarios = [
-  { user: 'kamilly', pass: 'petshop2025' },
-  { user: 'leocir', pass: 'admin' }
-];
-
-function fazerLogin(){
-  const u=document.getElementById('loginUser').value.trim().toLowerCase();
-  const p=document.getElementById('loginPass').value.trim();
-  const ok=usuarios.find(x=>x.user===u && x.pass===p);
-  if(ok){
-    document.getElementById('loginScreen').style.display='none';
-    mostrarAgenda();
-    document.getElementById('loginUser').value='';
-    document.getElementById('loginPass').value='';
-  } else {
-    alert('Usuário ou senha incorretos');
+/* ==================== AUTH ==================== */
+async function entrar(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){ alert('Informe email e senha'); return; }
+  try{
+    await auth.signInWithEmailAndPassword(email, pass);
+  }catch(e){
+    alert('Falha no login: '+(e.message||e));
   }
 }
+async function criarConta(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){ alert('Informe email e senha'); return; }
+  try{
+    await auth.createUserWithEmailAndPassword(email, pass);
+    alert('Conta criada com sucesso!');
+  }catch(e){
+    alert('Erro ao criar conta: '+(e.message||e));
+  }
+}
+async function resetSenha(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!email){ alert('Informe o email para recuperar a senha'); return; }
+  try{
+    await auth.sendPasswordResetEmail(email);
+    alert('Email de recuperação enviado.');
+  }catch(e){
+    alert('Erro ao enviar recuperação: '+(e.message||e));
+  }
+}
+async function sair(e){
+  if(e) e.preventDefault();
+  await auth.signOut();
+}
 
+auth.onAuthStateChanged(async (user)=>{
+  if(user){
+    document.getElementById('loginScreen').style.display='none';
+    mostrarAgenda();
+    await refreshCacheTutores();
+    await renderCalendario();
+  }else{
+    document.getElementById('loginScreen').style.display='flex';
+  }
+});
 
 /* ==================== NAV ==================== */
 function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));document.getElementById(id).classList.add('ativo');}
-function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');renderCalendario();atualizarTutoresSelect();}
-function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');renderTutores();}
+function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');}
+async function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');await renderTutores();}
+
+/* ==================== CACHE TUTORES/ANIMAIS ==================== */
+let TUTORES_CACHE=[]; // [{id,nome,endereco,tel,animais:[{id,nome,foto}]}]
+async function refreshCacheTutores(){
+  const tutSnap=await db.collection('tutores').get();
+  const arr=[];
+  for(const doc of tutSnap.docs){
+    const t={id:doc.id, ...doc.data(), animais:[]};
+    const aniSnap=await db.collection('tutores').doc(doc.id).collection('animais').get();
+    aniSnap.forEach(a=> t.animais.push({id:a.id, ...a.data()}));
+    arr.push(t);
+  }
+  TUTORES_CACHE=arr;
+  await atualizarTutoresSelect();
+}
 
 /* ==================== CALENDÁRIO ==================== */
-function renderCalendario(){
+async function renderCalendario(){
   const calendario=document.getElementById('calendario');
   calendario.innerHTML='';
 
-  const hoje=new Date();
-  const baseAno=hoje.getFullYear();
-  const baseMes=hoje.getMonth(); // 0-11
+  // carrega TODOS os banhos (simples). Em produção: filtrar por intervalo.
+  const banhosSnap=await db.collection('banhos').get();
+  const banhos=banhosSnap.docs.map(d=>({id:d.id, ...d.data()}));
 
-  const banhos=load(LS_BANHOS);
-  // Indexa banhos por data para renderizar rápido
   const porData=new Map();
   for(const b of banhos){
     if(!porData.has(b.data)) porData.set(b.data,[]);
     porData.get(b.data).push(b);
   }
 
+  const hoje=new Date();
+  const baseAno=hoje.getFullYear();
+  const baseMes=hoje.getMonth();
+
   for(let offset=0; offset<2; offset++){
-    const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1); // local
+    const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1);
     const ano=primeiroDiaMes.getFullYear();
-    const mes=primeiroDiaMes.getMonth(); // 0..11
+    const mes=primeiroDiaMes.getMonth();
     const nomeMes=primeiroDiaMes.toLocaleString('pt-BR',{month:'long'});
     const diasNoMes=new Date(ano, mes+1, 0).getDate();
 
@@ -273,15 +338,13 @@ function renderCalendario(){
     const grid=document.createElement('div');
     grid.className='dias';
 
-    // Segunda a domingo: (getDay() 0=Dom → 6=Sáb) => segunda=0
+    // Segunda a domingo
     const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
     for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
     for(let d=1; d<=diasNoMes; d++){
       const cell=document.createElement('div');
       cell.className='dia';
-
-      // marca hoje
       if(offset===0 && d===hoje.getDate()) cell.classList.add('hoje');
 
       const num=document.createElement('div');
@@ -291,11 +354,12 @@ function renderCalendario(){
 
       const dayStr=toYMD(ano, mes+1, d);
       const lista=porData.get(dayStr)||[];
+      lista.sort((a,b)=> a.horario.localeCompare(b.horario));
       for(const b of lista){
         const btn=document.createElement('button');
         btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
-        btn.textContent=`${getAnimalNome(b.animalId)} — ${b.horario}`;
-        btn.onclick=()=>abrirModal(b.id); // gerenciar
+        btn.textContent=`${getAnimalNome(b.tutorId,b.animalId)} — ${b.horario}`;
+        btn.onclick=()=>abrirModal(b.id);
         cell.appendChild(btn);
       }
 
@@ -308,135 +372,136 @@ function renderCalendario(){
 }
 
 /* ==================== TUTORES / CLIENTES ==================== */
-function adicionarTutor(){
+async function adicionarTutor(){
   const nome=document.getElementById('tutorNome').value.trim();
   const endereco=document.getElementById('tutorEndereco').value.trim();
   const tel=document.getElementById('tutorTelefone').value.trim();
   if(!nome) return alert('Informe o nome');
-  const tutores=load(LS_TUTORES);
-  tutores.push({id:uid(),nome,endereco,tel,animais:[]});
-  save(LS_TUTORES,tutores);
+
+  const docRef=await db.collection('tutores').add({nome,endereco,tel});
   document.getElementById('tutorNome').value='';
   document.getElementById('tutorEndereco').value='';
   document.getElementById('tutorTelefone').value='';
-  renderTutores();
-  atualizarTutoresSelect();
+  await refreshCacheTutores();
+  await renderTutores();
 }
-function adicionarAnimal(){
+async function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
   const file=document.getElementById('animalFoto').files[0];
   if(!tutorId) return alert('Selecione um tutor');
   if(!nome) return alert('Informe o nome do cliente');
+
+  let foto='';
   if(file){
     const reader=new FileReader();
-    reader.onload=e=> salvarAnimal(tutorId,nome,e.target.result);
+    reader.onload=async e=>{
+      foto=e.target.result;
+      await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
+      document.getElementById('animalNome').value='';
+      document.getElementById('animalFoto').value='';
+      await refreshCacheTutores();
+      await renderTutores();
+      await atualizarTutoresSelect();
+    };
     reader.readAsDataURL(file);
-  } else salvarAnimal(tutorId,nome,'');
+  } else {
+    await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
+    document.getElementById('animalNome').value='';
+    document.getElementById('animalFoto').value='';
+    await refreshCacheTutores();
+    await renderTutores();
+    await atualizarTutoresSelect();
+  }
 }
-function salvarAnimal(tutorId,nome,foto){
-  const tutores=load(LS_TUTORES);
-  const t=tutores.find(x=>x.id===tutorId);
-  if(!t) return;
-  t.animais.push({id:uid(),nome,foto});
-  save(LS_TUTORES,tutores);
-  document.getElementById('animalNome').value='';
-  document.getElementById('animalFoto').value='';
-  renderTutores();
-  atualizarTutoresSelect();
-}
-function renderTutores(){
-  const tutores=load(LS_TUTORES);
+async function renderTutores(){
   const container=document.getElementById('tutoresContainer');
   const sel=document.getElementById('animalTutor');
   container.innerHTML='';
   sel.innerHTML='<option value="">Selecione um Tutor</option>';
-  tutores.forEach(t=>{
+
+  for(const t of TUTORES_CACHE){
     sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
     const div=document.createElement('div');
     div.className='tutor-card';
     div.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
 
-    const btnEditar=document.createElement('i');
-    btnEditar.className="fa-solid fa-pencil edit-icon";
-    btnEditar.title='Editar tutor';
-    btnEditar.onclick=()=>alert('Editar Tutor: '+t.nome);
-
     const btnExcluir=document.createElement('i');
     btnExcluir.className="fa-solid fa-trash edit-icon";
     btnExcluir.title='Excluir tutor';
     btnExcluir.onclick=()=>excluirTutor(t.id);
-
-    div.appendChild(btnEditar);
     div.appendChild(btnExcluir);
 
     t.animais.forEach(a=>{
       const an=document.createElement('div');
       an.className='animal';
       an.innerHTML=`${a.foto?`<img src="${a.foto}">`:''}<span>${a.nome}</span>`;
-      const editAni=document.createElement('i');
-      editAni.className="fa-solid fa-pencil edit-icon";
-      editAni.title='Editar cliente';
-      editAni.onclick=()=>alert('Editar Cliente: '+a.nome);
       const delAni=document.createElement('i');
       delAni.className="fa-solid fa-trash edit-icon";
       delAni.title='Excluir cliente';
       delAni.onclick=()=>excluirAnimal(t.id,a.id);
-      an.appendChild(editAni);
       an.appendChild(delAni);
       div.appendChild(an);
     });
+
     container.appendChild(div);
-  });
+  }
 }
-function excluirTutor(id){
-  if(!confirm('Excluir este tutor e todos os clientes vinculados?')) return;
-  let tutores=load(LS_TUTORES);
-  tutores=tutores.filter(t=>t.id!==id);
-  save(LS_TUTORES,tutores);
-
-  // também removemos banhos associados ao tutor
-  let banhos=load(LS_BANHOS).filter(b=>b.tutorId!==id);
-  save(LS_BANHOS,banhos);
-
-  renderTutores(); atualizarTutoresSelect(); renderCalendario();
-}
-function excluirAnimal(tutorId, animalId){
-  if(!confirm('Excluir este cliente?')) return;
-  const tutores=load(LS_TUTORES);
-  const t=tutores.find(x=>x.id===tutorId);
-  if(!t) return;
-  t.animais=t.animais.filter(a=>a.id!==animalId);
-  save(LS_TUTORES,tutores);
-
-  // remove banhos deste animal
-  let banhos=load(LS_BANHOS).filter(b=>b.animalId!==animalId);
-  save(LS_BANHOS,banhos);
-
-  renderTutores(); atualizarTutoresSelect(); renderCalendario();
-}
-function atualizarTutoresSelect(){
-  const tutores=load(LS_TUTORES);
+async function atualizarTutoresSelect(){
   const sel=document.getElementById('tutorSelect');
   sel.innerHTML='<option value="">Selecione um tutor</option>';
-  tutores.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
-  carregarAnimais();
+  TUTORES_CACHE.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
+  await carregarAnimais();
 }
-function carregarAnimais(){
+async function carregarAnimais(){
   const tutorId=document.getElementById('tutorSelect').value;
-  const tutores=load(LS_TUTORES);
-  const t=tutores.find(x=>x.id===tutorId);
   const sel=document.getElementById('animalSelect');
   sel.innerHTML='<option value="">Selecione um cliente</option>';
+  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
   if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
 }
-function getAnimalNome(animalId){
-  const tutores=load(LS_TUTORES);
-  for(const t of tutores){
-    const a=t.animais.find(x=>x.id===animalId);
-    if(a) return a.nome;
-  }
-  return 'Cliente';
+function getAnimalNome(tutorId, animalId){
+  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
+  if(!t) return 'Cliente';
+  const a=t.animais.find(x=>x.id===animalId);
+  return a? a.nome : 'Cliente';
+}
+async function excluirTutor(tutorId){
+  if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
+  // apaga subcoleção animais
+  const aniSnap=await db.collection('tutores').doc(tutorId).collection('animais').get();
+  const batch=db.batch();
+  aniSnap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
+
+  // apaga banhos do tutor
+  const banhosSnap=await db.collection('banhos').where('tutorId','==',tutorId).get();
+  const batch2=db.batch();
+  banhosSnap.forEach(doc=> batch2.delete(doc.ref));
+  await batch2.commit();
+
+  // apaga tutor
+  await db.collection('tutores').doc(tutorId).delete();
+
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
+  await renderCalendario();
+}
+async function excluirAnimal(tutorId, animalId){
+  if(!confirm('Excluir este cliente e banhos vinculados?')) return;
+  await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
+
+  // remove banhos deste animal
+  const banhosSnap=await db.collection('banhos').where('animalId','==',animalId).get();
+  const batch=db.batch();
+  banhosSnap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
+
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
+  await renderCalendario();
 }
 
 /* ==================== BANHOS ==================== */
@@ -445,7 +510,7 @@ function togglePacoteOptions(){
   document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
 }
 
-function adicionarBanho(){
+async function adicionarBanho(){
   const tipo=document.getElementById('tipoBanho').value;
   const tutorId=document.getElementById('tutorSelect').value;
   const animalId=document.getElementById('animalSelect').value;
@@ -458,30 +523,28 @@ function adicionarBanho(){
     return;
   }
 
-  const banhos=load(LS_BANHOS);
   const pacoteId = (tipo==='pacote') ? uid() : null;
 
   if(tipo==='avulso'){
-    // grava exatamente a data digitada (string), sem criar Date -> evita fuso
-    banhos.push({id:uid(), pacoteId, tipo, tutorId, animalId, data, horario, valor});
+    const banho = { tipo, tutorId, animalId, data, horario, valor, pacoteId:null };
+    await db.collection('banhos').add(banho);
   } else {
     const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
-    // soma em passos de 7 dias a partir da data base (sempre com construtor local)
     let atual=data;
     for(let i=0;i<qtd;i++){
       if(i>0) atual = addDaysYMD(atual, 7);
-      banhos.push({id:uid(), pacoteId, tipo, tutorId, animalId, data:atual, horario, valor});
+      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, pacoteId };
+      await db.collection('banhos').add(banho);
     }
   }
 
-  save(LS_BANHOS,banhos);
-  renderCalendario();
+  await renderCalendario();
 
   // limpa campos
   document.getElementById('tipoBanho').value='avulso';
   togglePacoteOptions();
   document.getElementById('tutorSelect').value='';
-  carregarAnimais();
+  await carregarAnimais();
   document.getElementById('dataBanho').value='';
   document.getElementById('horario').value='';
   document.getElementById('valor').value='';
@@ -489,18 +552,16 @@ function adicionarBanho(){
 
 /* ==================== MODAL: editar/excluir ==================== */
 let modalBanhoId=null;
-function abrirModal(banhoId){
+async function abrirModal(banhoId){
   modalBanhoId=banhoId;
-  const banhos=load(LS_BANHOS);
-  const b=banhos.find(x=>x.id===banhoId);
+  const ref=db.collection('banhos').doc(banhoId);
+  const b=(await ref.get()).data();
   if(!b) return;
 
-  const info = `${getAnimalNome(b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
+  const info = `${getAnimalNome(b.tutorId,b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
   document.getElementById('modalInfo').textContent=info;
   document.getElementById('modalHorario').value=b.horario;
   document.getElementById('modalAplicarPacote').value='nao';
-
-  // mostrar botão "Excluir pacote" apenas se for pacote
   document.getElementById('btnExcluirPacote').style.display = (b.pacoteId) ? 'block':'none';
 
   document.getElementById('modalOverlay').style.display='flex';
@@ -509,56 +570,57 @@ function fecharModal(){
   document.getElementById('modalOverlay').style.display='none';
   modalBanhoId=null;
 }
-function salvarEdicaoBanho(){
+async function salvarEdicaoBanho(){
   const novoHorario=document.getElementById('modalHorario').value;
   const aplicar=document.getElementById('modalAplicarPacote').value==='sim';
   if(!modalBanhoId || !novoHorario) return;
 
-  let banhos=load(LS_BANHOS);
-  const alvo=banhos.find(x=>x.id===modalBanhoId);
+  const alvoRef=db.collection('banhos').doc(modalBanhoId);
+  const alvoSnap=await alvoRef.get();
+  const alvo=alvoSnap.data();
   if(!alvo) return;
 
   if(aplicar && alvo.pacoteId){
-    banhos=banhos.map(x=> x.pacoteId===alvo.pacoteId ? {...x, horario:novoHorario} : x);
+    const snap=await db.collection('banhos').where('pacoteId','==',alvo.pacoteId).get();
+    const batch=db.batch();
+    snap.forEach(doc=> batch.update(doc.ref,{horario:novoHorario}));
+    await batch.commit();
   }else{
-    banhos=banhos.map(x=> x.id===alvo.id ? {...x, horario:novoHorario} : x);
+    await alvoRef.update({horario:novoHorario});
   }
 
-  save(LS_BANHOS,banhos);
   fecharModal();
-  renderCalendario();
+  await renderCalendario();
 }
-function excluirEsteBanho(){
+async function excluirEsteBanho(){
   if(!modalBanhoId) return;
   if(!confirm('Deseja excluir apenas este banho?')) return;
-  let banhos=load(LS_BANHOS).filter(x=>x.id!==modalBanhoId);
-  save(LS_BANHOS,banhos);
+  await db.collection('banhos').doc(modalBanhoId).delete();
   fecharModal();
-  renderCalendario();
+  await renderCalendario();
 }
-function excluirPacote(){
+async function excluirPacote(){
   if(!modalBanhoId) return;
-  let banhos=load(LS_BANHOS);
-  const alvo=banhos.find(x=>x.id===modalBanhoId);
-  if(!alvo || !alvo.pacoteId) return;
+  const alvo=await db.collection('banhos').doc(modalBanhoId).get();
+  const b=alvo.data();
+  if(!b || !b.pacoteId) return;
   if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
-  banhos=banhos.filter(x=>x.pacoteId!==alvo.pacoteId);
-  save(LS_BANHOS,banhos);
+
+  const snap=await db.collection('banhos').where('pacoteId','==',b.pacoteId).get();
+  const batch=db.batch();
+  snap.forEach(doc=> batch.delete(doc.ref));
+  await batch.commit();
+
   fecharModal();
-  renderCalendario();
+  await renderCalendario();
 }
 
 /* ==================== INICIALIZAÇÃO ==================== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  // Estado inicial
+document.addEventListener('DOMContentLoaded', async ()=>{
   togglePacoteOptions();
-  renderTutores();
-  atualizarTutoresSelect();
-  // Deixa a Agenda pronta (após login ela aparece)
-  renderCalendario();
+  // A UI será liberada após login (onAuthStateChanged).
 });
 </script>
 
 </body>
 </html>
-
