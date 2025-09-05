@@ -5,6 +5,7 @@
 <title>Estética Animal — Agenda & Tutores</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
 :root{
   --rosa:#ff66a3;
@@ -15,7 +16,6 @@
   --sombra:0 4px 8px rgba(255,102,163,.3);
   --azul:#007bff;
   --verde:#28a745;
-  --cinza:#d6d6d6;
 }
 *{box-sizing:border-box}
 body{font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:var(--texto); margin:0;}
@@ -85,7 +85,7 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 #loginActions{display:flex; flex-direction:column; gap:8px; width:100%; align-items:center;}
 #loginSmall{margin-top:6px; font-size:12px; opacity:.8; text-align:center;}
 
-/* ======= MODAIS (GENÉRICOS) ======= */
+/* ======= MODAIS ======= */
 .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
 .modal{background:#fff; width:95%; max-width:480px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
 .modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
@@ -106,13 +106,15 @@ footer .dot{width:4px;height:4px;border-radius:50%;background:#ccc;display:inlin
 footer strong{color:#555;}
 </style>
 
-<!-- Firebase (compat builds para usar firebase.firestore()/auth()) -->
+<!-- Firebase (compat builds) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-storage-compat.js"></script>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="loginScreen">
   <img src="logo.png" alt="Logo" id="logoLogin">
   <h2>Login Estética Animal</h2>
@@ -168,7 +170,6 @@ footer strong{color:#555;}
       </div>
       <div class="field"><label for="dataBanho">Data</label><input type="date" id="dataBanho" /></div>
       <div class="field"><label for="horario">Horário</label><input type="time" id="horario" /></div>
-      <div class="field"><label for="valor">Valor (opcional)</label><input type="number" id="valor" step="0.01" min="0" /></div>
       <div class="field"><label for="obs">Observações (opcional)</label>
         <textarea id="obs" placeholder="Ex.: usar shampoo hipoalergênico, tosar patinhas, cliente nervoso, etc."></textarea>
       </div>
@@ -278,7 +279,7 @@ footer strong{color:#555;}
 <footer>
   <span>Estética Animal</span>
   <span class="dot"></span>
-  <span>Versão <strong>3.0</strong></span>
+  <span>Versão <strong>3.1.0</strong></span>
   <span class="dot"></span>
   <span>Produzido por <strong>Leocir</strong></span>
 </footer>
@@ -296,10 +297,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 
 /* ==================== UTIL / HELPERS ==================== */
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-// datas locais (evita fuso)
 const pad2=n=>String(n).padStart(2,'0');
 const toYMD=(y,m,d)=>`${y}-${pad2(m)}-${pad2(d)}`;
 function addDaysYMD(ymd, days){
@@ -381,7 +382,6 @@ async function renderCalendario(){
   const calendario=document.getElementById('calendario');
   calendario.innerHTML='';
 
-  // carrega TODOS os banhos (simples). Em produção: filtrar por intervalo.
   const banhosSnap=await db.collection('banhos').get();
   const banhos=banhosSnap.docs.map(d=>({id:d.id, ...d.data()}));
 
@@ -412,8 +412,7 @@ async function renderCalendario(){
     const grid=document.createElement('div');
     grid.className='dias';
 
-    // Segunda a domingo
-    const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
+    const inicio=(new Date(ano, mes, 1).getDay()+6)%7; // inicia em segunda
     for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
     for(let d=1; d<=diasNoMes; d++){
@@ -435,7 +434,7 @@ async function renderCalendario(){
         const nomeAnimal = getAnimalNome(b.tutorId,b.animalId);
         btn.textContent=`${nomeAnimal} — ${b.horario}`;
         if(b.obs && b.obs.trim()){
-          btn.title = b.obs; // tooltip com observações
+          btn.title = b.obs;
         }
         btn.onclick=()=>abrirModalBanho(b.id);
         cell.appendChild(btn);
@@ -463,6 +462,7 @@ async function adicionarTutor(){
   await refreshCacheTutores();
   await renderTutores();
 }
+
 async function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
@@ -470,28 +470,29 @@ async function adicionarAnimal(){
   if(!tutorId) return alert('Selecione um tutor');
   if(!nome) return alert('Informe o nome do cliente');
 
-  let foto='';
+  // cria doc primeiro para obter o ID
+  const docRef = await db.collection('tutores').doc(tutorId).collection('animais').add({nome, foto:''});
+
   if(file){
-    const reader=new FileReader();
-    reader.onload=async e=>{
-      foto=e.target.result;
-      await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
-      document.getElementById('animalNome').value='';
-      document.getElementById('animalFoto').value='';
-      await refreshCacheTutores();
-      await renderTutores();
-      await atualizarTutoresSelect();
-    };
-    reader.readAsDataURL(file);
-  } else {
-    await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
-    document.getElementById('animalNome').value='';
-    document.getElementById('animalFoto').value='';
-    await refreshCacheTutores();
-    await renderTutores();
-    await atualizarTutoresSelect();
+    try{
+      const path = `animais/${tutorId}/${docRef.id}-${file.name}`;
+      const storageRef = storage.ref().child(path);
+      await storageRef.put(file);
+      const url = await storageRef.getDownloadURL();
+      await docRef.update({foto:url});
+    }catch(err){
+      console.error(err);
+      alert('Falha ao enviar a foto. O cliente foi salvo sem foto.');
+    }
   }
+
+  document.getElementById('animalNome').value='';
+  document.getElementById('animalFoto').value='';
+  await refreshCacheTutores();
+  await renderTutores();
+  await atualizarTutoresSelect();
 }
+
 async function renderTutores(){
   const container=document.getElementById('tutoresContainer');
   const sel=document.getElementById('animalTutor');
@@ -573,6 +574,7 @@ async function renderTutores(){
     container.appendChild(card);
   }
 }
+
 async function atualizarTutoresSelect(){
   const sel=document.getElementById('tutorSelect');
   sel.innerHTML='<option value="">Selecione um tutor</option>';
@@ -592,8 +594,10 @@ function getAnimalNome(tutorId, animalId){
   const a=t.animais.find(x=>x.id===animalId);
   return a? a.nome : 'Cliente';
 }
+
 async function excluirTutor(tutorId){
   if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
+
   // apaga subcoleção animais
   const aniSnap=await db.collection('tutores').doc(tutorId).collection('animais').get();
   const batch=db.batch();
@@ -614,6 +618,7 @@ async function excluirTutor(tutorId){
   await atualizarTutoresSelect();
   await renderCalendario();
 }
+
 async function excluirAnimal(tutorId, animalId){
   if(!confirm('Excluir este cliente e banhos vinculados?')) return;
   await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
@@ -662,12 +667,12 @@ async function salvarEdicaoTutor(){
 /* ======= EDIÇÃO: ANIMAL ======= */
 let EDIT_ANIMAL_TUTOR_ID=null;
 let EDIT_ANIMAL_ID=null;
-let EDIT_ANIMAL_FOTO_DATAURL=null;
+let EDIT_ANIMAL_FILE=null;
 
 async function editarAnimal(tutorId, animalId){
   EDIT_ANIMAL_TUTOR_ID=tutorId;
   EDIT_ANIMAL_ID=animalId;
-  EDIT_ANIMAL_FOTO_DATAURL=null;
+  EDIT_ANIMAL_FILE=null;
 
   const snap=await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).get();
   const a=snap.data();
@@ -681,30 +686,47 @@ async function editarAnimal(tutorId, animalId){
 }
 function previewEditAnimalFoto(ev){
   const file=ev.target.files && ev.target.files[0];
-  if(!file){ EDIT_ANIMAL_FOTO_DATAURL=null; return; }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    EDIT_ANIMAL_FOTO_DATAURL = e.target.result;
-    const prev=document.getElementById('editAnimalPreview');
-    prev.src = EDIT_ANIMAL_FOTO_DATAURL;
-    prev.style.display='block';
-  };
-  reader.readAsDataURL(file);
+  EDIT_ANIMAL_FILE = file || null;
+  const prev=document.getElementById('editAnimalPreview');
+  if(file){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      prev.src = e.target.result;
+      prev.style.display='block';
+    };
+    reader.readAsDataURL(file);
+  }else{
+    prev.src='';
+    prev.style.display='none';
+  }
 }
 function fecharModalAnimal(){
   document.getElementById('modalAnimalOverlay').style.display='none';
   EDIT_ANIMAL_TUTOR_ID=null;
   EDIT_ANIMAL_ID=null;
-  EDIT_ANIMAL_FOTO_DATAURL=null;
+  EDIT_ANIMAL_FILE=null;
 }
 async function salvarEdicaoAnimal(){
   if(!EDIT_ANIMAL_TUTOR_ID || !EDIT_ANIMAL_ID) return;
   const nome=document.getElementById('editAnimalNome').value.trim();
+  const ref = db.collection('tutores').doc(EDIT_ANIMAL_TUTOR_ID).collection('animais').doc(EDIT_ANIMAL_ID);
+
   const payload={ nome };
-  if(EDIT_ANIMAL_FOTO_DATAURL!==null){ // usuário escolheu nova foto
-    payload.foto = EDIT_ANIMAL_FOTO_DATAURL;
+
+  if(EDIT_ANIMAL_FILE){
+    try{
+      const path = `animais/${EDIT_ANIMAL_TUTOR_ID}/${EDIT_ANIMAL_ID}-${EDIT_ANIMAL_FILE.name}`;
+      const storageRef = storage.ref().child(path);
+      await storageRef.put(EDIT_ANIMAL_FILE);
+      const url = await storageRef.getDownloadURL();
+      payload.foto = url;
+    }catch(err){
+      console.error(err);
+      alert('Falha ao atualizar a foto. Salvando apenas o nome.');
+    }
   }
-  await db.collection('tutores').doc(EDIT_ANIMAL_TUTOR_ID).collection('animais').doc(EDIT_ANIMAL_ID).update(payload);
+
+  await ref.update(payload);
   fecharModalAnimal();
   await refreshCacheTutores();
   await renderTutores();
@@ -724,7 +746,6 @@ async function adicionarBanho(){
   const animalId=document.getElementById('animalSelect').value;
   const data=document.getElementById('dataBanho').value; // YYYY-MM-DD
   const horario=document.getElementById('horario').value;
-  const valor=document.getElementById('valor').value || '';
   const obs=document.getElementById('obs').value || '';
 
   if(!tutorId || !animalId || !data || !horario){
@@ -735,14 +756,14 @@ async function adicionarBanho(){
   const pacoteId = (tipo==='pacote') ? uid() : null;
 
   if(tipo==='avulso'){
-    const banho = { tipo, tutorId, animalId, data, horario, valor, obs, pacoteId:null };
+    const banho = { tipo, tutorId, animalId, data, horario, obs, pacoteId:null };
     await db.collection('banhos').add(banho);
   } else {
     const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
     let atual=data;
     for(let i=0;i<qtd;i++){
       if(i>0) atual = addDaysYMD(atual, 7);
-      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, obs, pacoteId };
+      const banho={ tipo, tutorId, animalId, data:atual, horario, obs, pacoteId };
       await db.collection('banhos').add(banho);
     }
   }
@@ -756,11 +777,10 @@ async function adicionarBanho(){
   await carregarAnimais();
   document.getElementById('dataBanho').value='';
   document.getElementById('horario').value='';
-  document.getElementById('valor').value='';
   document.getElementById('obs').value='';
 }
 
-/* ==================== MODAL: editar/excluir BANHO ==================== */
+/* ==================== MODAL BANHO ==================== */
 let modalBanhoId=null;
 async function abrirModalBanho(banhoId){
   modalBanhoId=banhoId;
@@ -836,4 +856,3 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
 </body>
 </html>
-
