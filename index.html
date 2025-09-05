@@ -5,7 +5,6 @@
 <title>Estética Animal — Agenda & Tutores</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
 :root{
   --rosa:#ff66a3;
@@ -72,13 +71,15 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 .tutor-actions{display:flex; gap:10px; align-items:center;}
 .tutor-card span{font-size:14px;}
 .animal{display:flex; align-items:center; gap:10px; margin-top:6px; justify-content:space-between;}
-.animal-left{display:flex; align-items:center; gap:10px; cursor:pointer;}
+.animal-left{display:flex; align-items:center; gap:10px;}
 .animal img{width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.08);}
-.icon-btn{cursor:pointer; color:var(--rosa-escuro);} .icon-btn:hover{color:var(--rosa);}
+.icon-btn{cursor:pointer; color:var(--rosa-escuro);}
+.icon-btn:hover{color:var(--rosa);}
+.link-foto{font-size:12px; color:#0d6efd; text-decoration:underline; cursor:pointer}
 
 /* ======= LOGIN ======= */
 #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
-#loginScreen h2{margin-bottom:14px; color:var(--rosa-escuro);} 
+#loginScreen h2{margin-bottom:14px; color:var(--rosa-escuro);}
 #loginScreen input{width:260px; padding:10px; margin:6px 0; border:2px solid var(--rosa); border-radius:10px;}
 #loginScreen button{width:100%; max-width:280px; padding:10px; margin-top:10px; background:var(--rosa); color:#fff; border:none; border-radius:10px; font-weight:bold; cursor:pointer;}
 #loginScreen #logoLogin{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:12px;}
@@ -87,18 +88,21 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 
 /* ======= MODAIS ======= */
 .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
-.modal{background:#fff; width:95%; max-width:520px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+.modal{background:#fff; width:95%; max-width:480px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
 .modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
 .modal-row{display:flex; gap:10px; margin:8px 0;}
 .modal-row > *{flex:1;}
 .modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
-.btn-danger{background:#dc3545; color:#fff;} .btn-secondary{background:#6c757d; color:#fff;}
+.btn-danger{background:#dc3545; color:#fff;}
+.btn-secondary{background:#6c757d; color:#fff;}
 .small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
-.preview{width:64px; height:64px; border-radius:12px; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.1);} 
-.link-inline{display:inline-block; margin-top:4px; font-size:12px;}
+.preview{width:64px; height:64px; border-radius:12px; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.1);}
 
 /* ======= RODAPÉ ======= */
-footer{ position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid #eee; padding:8px 12px; display:flex; align-items:center; justify-content:center; gap:8px; color:#777; font-size:12px; z-index:999; }
+footer{
+  position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid #eee; padding:8px 12px;
+  display:flex; align-items:center; justify-content:center; gap:8px; color:#777; font-size:12px; z-index:999;
+}
 footer .dot{width:4px;height:4px;border-radius:50%;background:#ccc;display:inline-block;}
 footer strong{color:#555;}
 </style>
@@ -111,7 +115,6 @@ footer strong{color:#555;}
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginScreen">
   <img src="logo.png" alt="Logo" id="logoLogin">
   <h2>Login Estética Animal</h2>
@@ -188,8 +191,8 @@ footer strong{color:#555;}
       <select id="animalTutor"></select><br>
       <input type="text" id="animalNome" placeholder="Nome do Cliente" /><br>
       <input type="file" id="animalFoto" accept="image/*" /><br>
-      <div class="small">Dica: você pode salvar sem foto e adicionar depois em "Editar".</div>
-      <button class="btn btn-avulso" onclick="adicionarAnimal()">Salvar Cliente</button>
+      <button class="btn btn-avulso" id="btnSalvarAnimal" onclick="adicionarAnimal()">Salvar Cliente</button>
+      <div id="ajudaUpload" class="small" style="display:none">Enviando foto… aguarde.</div>
     </div>
     <div id="listaTutores">
       <h3>Tutores Registrados</h3>
@@ -263,14 +266,16 @@ footer strong{color:#555;}
     <div class="field">
       <label>Foto (opcional)</label>
       <div class="modal-row" style="align-items:center;">
-        <img id="editAnimalPreview" class="preview" alt="Prévia">
+        <img id="editAnimalPreview" class="preview" alt="Prévia" style="display:none">
         <input type="file" id="editAnimalFoto" accept="image/*" onchange="previewEditAnimalFoto(event)">
       </div>
-      <a id="btnAbrirFotoAtual" href="#" class="link-inline" style="display:none" target="_blank">Abrir foto atual</a>
-      <div class="small">Se não selecionar um arquivo, a foto atual será mantida.</div>
+      <div id="editAnimalLinkWrap" class="small" style="display:none">
+        <a id="editAnimalLink" href="#" target="_blank" class="link-foto">Abrir foto atual</a>
+      </div>
+      <div id="editUploadHint" class="small" style="display:none">Enviando nova foto…</div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-avulso" onclick="salvarEdicaoAnimal()">Salvar</button>
+      <button class="btn btn-avulso" id="btnSalvarAnimalEdit" onclick="salvarEdicaoAnimal()">Salvar</button>
       <button class="btn btn-secondary" onclick="fecharModalAnimal()">Cancelar</button>
     </div>
   </div>
@@ -279,7 +284,7 @@ footer strong{color:#555;}
 <footer>
   <span>Estética Animal</span>
   <span class="dot"></span>
-  <span>Versão <strong>3.2.0</strong></span>
+  <span>Versão <strong>3.3.1</strong></span>
   <span class="dot"></span>
   <span>Produzido por <strong>Leocir</strong></span>
 </footer>
@@ -308,13 +313,13 @@ function addDaysYMD(ymd, days){
   const dt=new Date(Y, M-1, D+days);
   return toYMD(dt.getFullYear(), dt.getMonth()+1, dt.getDate());
 }
-function extFromType(type){
-  switch(type){
-    case 'image/jpeg': return 'jpg';
-    case 'image/png': return 'png';
-    case 'image/webp': return 'webp';
-    default: return 'bin';
-  }
+function fileExt(file){
+  const n=file?.name||"";
+  const i=n.lastIndexOf(".");
+  return (i>=0? n.slice(i+1).toLowerCase() : "jpg").replace(/[^a-z0-9]/gi,"");
+}
+function isImage(file){
+  return !!file && /^image\//.test(file.type || "");
 }
 
 /* ==================== AUTH ==================== */
@@ -349,7 +354,10 @@ async function resetSenha(){
     alert('Erro ao enviar recuperação: '+(e.message||e));
   }
 }
-async function sair(e){ if(e) e.preventDefault(); await auth.signOut(); }
+async function sair(e){
+  if(e) e.preventDefault();
+  await auth.signOut();
+}
 
 auth.onAuthStateChanged(async (user)=>{
   if(user){
@@ -372,9 +380,9 @@ let TUTORES_CACHE=[]; // [{id,nome,endereco,tel,animais:[{id,nome,foto}]}]
 async function refreshCacheTutores(){
   const tutSnap=await db.collection('tutores').get();
   const arr=[];
-  for(const doc of tutSnap.docs){
-    const t={id:doc.id, ...doc.data(), animais:[]};
-    const aniSnap=await db.collection('tutores').doc(doc.id).collection('animais').get();
+  for(const docu of tutSnap.docs){
+    const t={id:docu.id, ...docu.data(), animais:[]};
+    const aniSnap=await db.collection('tutores').doc(docu.id).collection('animais').get();
     aniSnap.forEach(a=> t.animais.push({id:a.id, ...a.data()}));
     arr.push(t);
   }
@@ -417,7 +425,8 @@ async function renderCalendario(){
     const grid=document.createElement('div');
     grid.className='dias';
 
-    const inicio=(new Date(ano, mes, 1).getDay()+6)%7; // inicia em segunda
+    // Segunda a domingo
+    const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
     for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
 
     for(let d=1; d<=diasNoMes; d++){
@@ -438,7 +447,9 @@ async function renderCalendario(){
         btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
         const nomeAnimal = getAnimalNome(b.tutorId,b.animalId);
         btn.textContent=`${nomeAnimal} — ${b.horario}`;
-        if(b.obs && b.obs.trim()){ btn.title = b.obs; }
+        if(b.obs && b.obs.trim()){
+          btn.title = b.obs;
+        }
         btn.onclick=()=>abrirModalBanho(b.id);
         cell.appendChild(btn);
       }
@@ -458,47 +469,62 @@ async function adicionarTutor(){
   const tel=document.getElementById('tutorTelefone').value.trim();
   if(!nome) return alert('Informe o nome');
 
-  await db.collection('tutores').add({nome,endereco,tel});
-  document.getElementById('tutorNome').value='';
-  document.getElementById('tutorEndereco').value='';
-  document.getElementById('tutorTelefone').value='';
-  await refreshCacheTutores();
-  await renderTutores();
+  try{
+    await db.collection('tutores').add({nome,endereco,tel});
+    document.getElementById('tutorNome').value='';
+    document.getElementById('tutorEndereco').value='';
+    document.getElementById('tutorTelefone').value='';
+    await refreshCacheTutores();
+    await renderTutores();
+  }catch(e){
+    alert('Erro ao salvar tutor: ' + (e.message||e));
+  }
+}
+
+async function uploadAnimalPhoto(tutorId, animalId, file){
+  if(!file) return '';
+  if(!isImage(file)) throw new Error('Arquivo selecionado não é uma imagem.');
+  if(file.size > 8*1024*1024) throw new Error('Imagem maior que 8MB. Escolha um arquivo menor.');
+  const ext=fileExt(file)||'jpg';
+  const path=`animais/${tutorId}/${animalId}.${ext}`;
+  const ref=storage.ref().child(path);
+  const metadata={contentType: file.type || 'image/jpeg', cacheControl: 'public,max-age=31536000'};
+  await ref.put(file, metadata);
+  const url=await ref.getDownloadURL();
+  return url;
 }
 
 async function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
   const file=document.getElementById('animalFoto').files[0];
+  const btn=document.getElementById('btnSalvarAnimal');
+  const hint=document.getElementById('ajudaUpload');
+
   if(!tutorId) return alert('Selecione um tutor');
   if(!nome) return alert('Informe o nome do cliente');
 
-  // cria doc primeiro para obter o ID
-  const docRef = await db.collection('tutores').doc(tutorId).collection('animais').add({nome, foto:''});
+  try{
+    btn.disabled=true; hint.style.display='block';
 
-  if(file){
-    if(file.size > 8*1024*1024){
-      alert('Arquivo muito grande (máx. 8MB). O cliente foi salvo sem foto.');
-    }else{
-      try{
-        const ext = extFromType(file.type);
-        const path = `animais/${tutorId}/${docRef.id}.${ext}`; // nome estável por ID
-        const storageRef = storage.ref().child(path);
-        await storageRef.put(file, {contentType:file.type});
-        const url = await storageRef.getDownloadURL();
-        await docRef.update({foto:url});
-      }catch(err){
-        console.error(err);
-        alert('Falha ao enviar a foto. O cliente foi salvo sem foto. Verifique as regras do Storage.');
-      }
+    // cria doc com ID conhecido para usar no path da foto
+    const docRef=db.collection('tutores').doc(tutorId).collection('animais').doc();
+    let fotoURL='';
+    if(file){
+      fotoURL=await uploadAnimalPhoto(tutorId, docRef.id, file);
     }
-  }
+    await docRef.set({nome, foto: fotoURL});
 
-  document.getElementById('animalNome').value='';
-  document.getElementById('animalFoto').value='';
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
+    document.getElementById('animalNome').value='';
+    document.getElementById('animalFoto').value='';
+    await refreshCacheTutores();
+    await renderTutores();
+    await atualizarTutoresSelect();
+  }catch(e){
+    alert('Erro ao salvar cliente: ' + (e.message||e));
+  }finally{
+    btn.disabled=false; hint.style.display='none';
+  }
 }
 
 async function renderTutores(){
@@ -546,17 +572,17 @@ async function renderTutores(){
       left.className='animal-left';
       if(a.foto){
         const img=document.createElement('img');
-        img.src=a.foto; img.alt=a.nome;
+        img.src=a.foto;
+        img.alt=a.nome;
+        img.title='Abrir foto';
+        img.style.cursor='pointer';
+        img.onclick=()=>window.open(a.foto, '_blank');
         left.appendChild(img);
-        left.title='Clique para abrir a foto';
-        left.onclick=()=>{ window.open(a.foto, '_blank'); };
       } else {
         const placeholder=document.createElement('div');
         placeholder.style.width='40px'; placeholder.style.height='40px';
         placeholder.style.borderRadius='50%'; placeholder.style.background='#f3f3f3'; placeholder.style.border='2px solid #fff';
         left.appendChild(placeholder);
-        left.title='Sem foto cadastrada';
-        left.onclick=()=>{ alert('Este cliente ainda não possui foto cadastrada.'); };
       }
       const span=document.createElement('span');
       span.textContent=a.nome;
@@ -605,7 +631,6 @@ function getAnimalNome(tutorId, animalId){
   const a=t.animais.find(x=>x.id===animalId);
   return a? a.nome : 'Cliente';
 }
-
 async function excluirTutor(tutorId){
   if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
   // apaga subcoleção animais
@@ -628,7 +653,6 @@ async function excluirTutor(tutorId){
   await atualizarTutoresSelect();
   await renderCalendario();
 }
-
 async function excluirAnimal(tutorId, animalId){
   if(!confirm('Excluir este cliente e banhos vinculados?')) return;
   await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
@@ -677,76 +701,69 @@ async function salvarEdicaoTutor(){
 /* ======= EDIÇÃO: ANIMAL ======= */
 let EDIT_ANIMAL_TUTOR_ID=null;
 let EDIT_ANIMAL_ID=null;
-let EDIT_ANIMAL_FILE=null;
-let EDIT_ANIMAL_URL_ATUAL='';
-
+let EDIT_ANIMAL_FILE=null; // arquivo novo (File), não base64
 async function editarAnimal(tutorId, animalId){
   EDIT_ANIMAL_TUTOR_ID=tutorId;
   EDIT_ANIMAL_ID=animalId;
   EDIT_ANIMAL_FILE=null;
-  EDIT_ANIMAL_URL_ATUAL='';
 
   const snap=await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).get();
   const a=snap.data();
   if(!a) return;
   document.getElementById('editAnimalNome').value = a.nome || '';
+
   const prev=document.getElementById('editAnimalPreview');
-  prev.src = a.foto || '';
-  prev.style.display = a.foto ? 'block' : 'none';
+  const linkWrap=document.getElementById('editAnimalLinkWrap');
+  const link=document.getElementById('editAnimalLink');
+
+  if(a.foto){
+    prev.src = a.foto;
+    prev.style.display='block';
+    link.href=a.foto; linkWrap.style.display='block';
+  }else{
+    prev.src=''; prev.style.display='none';
+    linkWrap.style.display='none';
+  }
   document.getElementById('editAnimalFoto').value='';
-  EDIT_ANIMAL_URL_ATUAL = a.foto || '';
-  const abrir = document.getElementById('btnAbrirFotoAtual');
-  if(EDIT_ANIMAL_URL_ATUAL){ abrir.style.display='inline-block'; abrir.href = EDIT_ANIMAL_URL_ATUAL; }
-  else { abrir.style.display='none'; abrir.removeAttribute('href'); }
   document.getElementById('modalAnimalOverlay').style.display='flex';
 }
 function previewEditAnimalFoto(ev){
   const file=ev.target.files && ev.target.files[0];
-  EDIT_ANIMAL_FILE = file || null;
+  if(!file){ EDIT_ANIMAL_FILE=null; return; }
+  EDIT_ANIMAL_FILE=file;
   const prev=document.getElementById('editAnimalPreview');
-  if(file){
-    const reader=new FileReader();
-    reader.onload=e=>{ prev.src = e.target.result; prev.style.display='block'; };
-    reader.readAsDataURL(file);
-  }else{
-    prev.src=''; prev.style.display='none';
-  }
+  prev.src = URL.createObjectURL(file);
+  prev.style.display='block';
 }
 function fecharModalAnimal(){
   document.getElementById('modalAnimalOverlay').style.display='none';
-  EDIT_ANIMAL_TUTOR_ID=null; EDIT_ANIMAL_ID=null; EDIT_ANIMAL_FILE=null; EDIT_ANIMAL_URL_ATUAL='';
+  EDIT_ANIMAL_TUTOR_ID=null;
+  EDIT_ANIMAL_ID=null;
+  EDIT_ANIMAL_FILE=null;
 }
 async function salvarEdicaoAnimal(){
   if(!EDIT_ANIMAL_TUTOR_ID || !EDIT_ANIMAL_ID) return;
   const nome=document.getElementById('editAnimalNome').value.trim();
-  const ref = db.collection('tutores').doc(EDIT_ANIMAL_TUTOR_ID).collection('animais').doc(EDIT_ANIMAL_ID);
-
   const payload={ nome };
-
-  if(EDIT_ANIMAL_FILE){
-    if(EDIT_ANIMAL_FILE.size > 8*1024*1024){
-      alert('Arquivo muito grande (máx. 8MB). A foto não foi atualizada.');
-    }else{
-      try{
-        const ext = extFromType(EDIT_ANIMAL_FILE.type);
-        const path = `animais/${EDIT_ANIMAL_TUTOR_ID}/${EDIT_ANIMAL_ID}.${ext}`; // substitui sempre
-        const storageRef = storage.ref().child(path);
-        await storageRef.put(EDIT_ANIMAL_FILE, {contentType:EDIT_ANIMAL_FILE.type});
-        const url = await storageRef.getDownloadURL();
-        payload.foto = url;
-      }catch(err){
-        console.error(err);
-        alert('Falha ao atualizar a foto. Salvando apenas o nome. Verifique as regras do Storage.');
-      }
+  const btn=document.getElementById('btnSalvarAnimalEdit');
+  const hint=document.getElementById('editUploadHint');
+  try{
+    btn.disabled=true; hint.style.display='block';
+    if(EDIT_ANIMAL_FILE){
+      const url=await uploadAnimalPhoto(EDIT_ANIMAL_TUTOR_ID, EDIT_ANIMAL_ID, EDIT_ANIMAL_FILE);
+      payload.foto=url;
     }
+    await db.collection('tutores').doc(EDIT_ANIMAL_TUTOR_ID).collection('animais').doc(EDIT_ANIMAL_ID).update(payload);
+    fecharModalAnimal();
+    await refreshCacheTutores();
+    await renderTutores();
+    await atualizarTutoresSelect();
+    await renderCalendario();
+  }catch(e){
+    alert('Erro ao salvar cliente: ' + (e.message||e));
+  }finally{
+    btn.disabled=false; hint.style.display='none';
   }
-
-  await ref.update(payload);
-  fecharModalAnimal();
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
-  await renderCalendario();
 }
 
 /* ==================== BANHOS ==================== */
@@ -770,32 +787,35 @@ async function adicionarBanho(){
 
   const pacoteId = (tipo==='pacote') ? uid() : null;
 
-  if(tipo==='avulso'){
-    const banho = { tipo, tutorId, animalId, data, horario, obs, pacoteId:null };
-    await db.collection('banhos').add(banho);
-  } else {
-    const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
-    let atual=data;
-    for(let i=0;i<qtd;i++){
-      if(i>0) atual = addDaysYMD(atual, 7);
-      const banho={ tipo, tutorId, animalId, data:atual, horario, obs, pacoteId };
+  try{
+    if(tipo==='avulso'){
+      const banho = { tipo, tutorId, animalId, data, horario, obs, pacoteId:null };
       await db.collection('banhos').add(banho);
+    } else {
+      const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
+      let atual=data;
+      for(let i=0;i<qtd;i++){
+        if(i>0) atual = addDaysYMD(atual, 7);
+        const banho={ tipo, tutorId, animalId, data:atual, horario, obs, pacoteId };
+        await db.collection('banhos').add(banho);
+      }
     }
+    await renderCalendario();
+
+    // limpa campos
+    document.getElementById('tipoBanho').value='avulso';
+    togglePacoteOptions();
+    document.getElementById('tutorSelect').value='';
+    await carregarAnimais();
+    document.getElementById('dataBanho').value='';
+    document.getElementById('horario').value='';
+    document.getElementById('obs').value='';
+  }catch(e){
+    alert('Erro ao salvar agendamento: ' + (e.message||e));
   }
-
-  await renderCalendario();
-
-  // limpa campos
-  document.getElementById('tipoBanho').value='avulso';
-  togglePacoteOptions();
-  document.getElementById('tutorSelect').value='';
-  await carregarAnimais();
-  document.getElementById('dataBanho').value='';
-  document.getElementById('horario').value='';
-  document.getElementById('obs').value='';
 }
 
-/* ==================== MODAL BANHO ==================== */
+/* ==================== MODAL: editar/excluir BANHO ==================== */
 let modalBanhoId=null;
 async function abrirModalBanho(banhoId){
   modalBanhoId=banhoId;
@@ -812,7 +832,10 @@ async function abrirModalBanho(banhoId){
 
   document.getElementById('modalBanhoOverlay').style.display='flex';
 }
-function fecharModalBanho(){ document.getElementById('modalBanhoOverlay').style.display='none'; modalBanhoId=null; }
+function fecharModalBanho(){
+  document.getElementById('modalBanhoOverlay').style.display='none';
+  modalBanhoId=null;
+}
 async function salvarEdicaoBanho(){
   const novoHorario=document.getElementById('modalHorario').value;
   const novasObs=(document.getElementById('modalObs').value||'');
