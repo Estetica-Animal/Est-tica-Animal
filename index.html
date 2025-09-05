@@ -35,7 +35,7 @@ nav a{display:inline-block; color:#fff; text-decoration:none; font-weight:bold; 
 nav a:hover{background:#fff; color:var(--rosa)}
 nav a.ativo{background:#fff; color:var(--rosa)}
 
-main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* espaço pro rodapé */
+main{max-width:1200px; margin:0 auto 24px; padding:100px 16px 24px 16px;}
 
 /* ======= AGENDA ======= */
 #agendaMain{display:flex; gap:20px; align-items:flex-start}
@@ -51,13 +51,12 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 .badge.avulso{background:var(--azul)}
 .badge.pacote{background:var(--verde)}
 
-/* ======= SIDEBAR ======= */
 #sidebar{width:320px; background:var(--card); border-radius:14px; padding:16px; box-shadow:var(--sombra); position:sticky; top:92px;}
 #sidebar h3{margin-top:0; color:var(--rosa-escuro); text-align:center}
 .field{margin-bottom:10px}
 .field label{display:block; font-size:13px; margin-bottom:4px}
-.field input, .field select, .field textarea{width:100%; padding:10px; border:2px solid var(--rosa); border-radius:10px; background:#fff; font-family:inherit;}
-.field textarea{min-height:70px; resize:vertical;}
+.field input, .field select, .field textarea{width:100%; padding:10px; border:2px solid var(--rosa); border-radius:10px; background:#fff;}
+textarea{resize:vertical; min-height:60px;}
 .btn{display:inline-block; width:100%; border:none; border-radius:10px; padding:10px 12px; font-weight:bold; cursor:pointer; transition:.2s; box-shadow:var(--sombra);}
 .btn:hover{transform:translateY(-1px)}
 .btn-avulso{background:var(--azul); color:#fff}
@@ -67,14 +66,11 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 #formTutor, #formAnimal, #listaTutores{background:var(--card); padding:16px; border-radius:14px; box-shadow:var(--sombra);}
 #listaTutores h3{margin-top:0; color:var(--rosa-escuro);}
 .tutor-card{border-bottom:1px solid #eee; padding:10px 0; display:flex; flex-direction:column; gap:6px;}
-.tutor-header{display:flex; align-items:center; justify-content:space-between; gap:10px;}
-.tutor-actions{display:flex; gap:10px; align-items:center;}
 .tutor-card span{font-size:14px;}
 .animal{display:flex; align-items:center; gap:10px; margin-top:6px; justify-content:space-between;}
-.animal-left{display:flex; align-items:center; gap:10px;}
-.animal img{width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.08);}
-.icon-btn{cursor:pointer; color:var(--rosa-escuro);}
-.icon-btn:hover{color:var(--rosa);}
+.animal img{width:50px; height:50px; border-radius:50%; object-fit:cover;}
+.edit-icon{cursor:pointer; color:var(--rosa-escuro); margin-left:6px;}
+.edit-icon:hover{color:var(--rosa);}
 
 /* ======= LOGIN ======= */
 #loginScreen{position:fixed; inset:0; background:rgba(255,255,255,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3000;}
@@ -85,25 +81,19 @@ main{max-width:1200px; margin:0 auto 80px; padding:100px 16px 24px 16px;} /* esp
 #loginActions{display:flex; flex-direction:column; gap:8px; width:100%; align-items:center;}
 #loginSmall{margin-top:6px; font-size:12px; opacity:.8; text-align:center;}
 
-/* ======= MODAIS (GENÉRICOS) ======= */
-.modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
-.modal{background:#fff; width:95%; max-width:480px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
-.modal h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
+/* ======= MODAL ======= */
+#modalOverlay, #modalOverlayEdit{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:4000;}
+#modal, #modalEdit{background:#fff; width:95%; max-width:420px; border-radius:14px; box-shadow:var(--sombra); padding:16px;}
+#modal h3, #modalEdit h3{margin:0 0 8px; color:var(--rosa-escuro); text-align:center;}
 .modal-row{display:flex; gap:10px; margin:8px 0;}
 .modal-row > *{flex:1;}
 .modal-actions{display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px;}
 .btn-danger{background:#dc3545; color:#fff;}
 .btn-secondary{background:#6c757d; color:#fff;}
 .small{font-size:12px; opacity:.8; margin-top:-4px; text-align:center;}
-.preview{width:64px; height:64px; border-radius:12px; object-fit:cover; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.1);}
 
-/* ======= RODAPÉ ======= */
-footer{
-  position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid #eee; padding:8px 12px;
-  display:flex; align-items:center; justify-content:center; gap:8px; color:#777; font-size:12px; z-index:999;
-}
-footer .dot{width:4px;height:4px;border-radius:50%;background:#ccc;display:inline-block;}
-footer strong{color:#555;}
+/* ======= FOOTER ======= */
+footer{background:var(--rosa); color:#fff; text-align:center; padding:10px; position:fixed; bottom:0; left:0; right:0; font-size:13px;}
 </style>
 
 <!-- Firebase (compat builds para usar firebase.firestore()/auth()) -->
@@ -168,10 +158,7 @@ footer strong{color:#555;}
       </div>
       <div class="field"><label for="dataBanho">Data</label><input type="date" id="dataBanho" /></div>
       <div class="field"><label for="horario">Horário</label><input type="time" id="horario" /></div>
-      <div class="field"><label for="valor">Valor (opcional)</label><input type="number" id="valor" step="0.01" min="0" /></div>
-      <div class="field"><label for="obs">Observações (opcional)</label>
-        <textarea id="obs" placeholder="Ex.: usar shampoo hipoalergênico, tosar patinhas, cliente nervoso, etc."></textarea>
-      </div>
+      <div class="field"><label for="obs">Observações</label><textarea id="obs"></textarea></div>
       <button class="btn btn-avulso" onclick="adicionarBanho()">Adicionar</button>
     </aside>
   </section>
@@ -199,9 +186,9 @@ footer strong{color:#555;}
   </section>
 </main>
 
-<!-- ======= MODAL EDIÇÃO DE BANHO ======= -->
-<div id="modalBanhoOverlay" class="modal-overlay">
-  <div class="modal" id="modalBanho">
+<!-- ======= MODAL EDIÇÃO BANHO ======= -->
+<div id="modalOverlay">
+  <div id="modal">
     <h3>Gerenciar Agendamento</h3>
     <div class="small" id="modalInfo"></div>
     <div class="modal-row">
@@ -218,70 +205,31 @@ footer strong{color:#555;}
       </div>
     </div>
     <div class="field">
-      <label for="modalObs">Observações (opcional)</label>
-      <textarea id="modalObs" placeholder="Notas deste atendimento"></textarea>
+      <label>Observações</label>
+      <textarea id="modalObs"></textarea>
     </div>
     <div class="modal-actions">
       <button class="btn btn-avulso" onclick="salvarEdicaoBanho()">Salvar alterações</button>
       <button class="btn btn-danger" onclick="excluirEsteBanho()">Excluir apenas este</button>
       <button class="btn btn-danger" id="btnExcluirPacote" style="display:none" onclick="excluirPacote()">Excluir pacote inteiro</button>
-      <button class="btn btn-secondary" onclick="fecharModalBanho()">Cancelar</button>
+      <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- ======= MODAL EDIÇÃO DE TUTOR ======= -->
-<div id="modalTutorOverlay" class="modal-overlay">
-  <div class="modal" id="modalTutor">
-    <h3>Editar Tutor</h3>
-    <div class="field">
-      <label>Nome</label>
-      <input type="text" id="editTutorNome">
-    </div>
-    <div class="field">
-      <label>Endereço</label>
-      <input type="text" id="editTutorEndereco">
-    </div>
-    <div class="field">
-      <label>Telefone</label>
-      <input type="text" id="editTutorTelefone">
-    </div>
+<!-- ======= MODAL EDIÇÃO TUTOR/ANIMAL ======= -->
+<div id="modalOverlayEdit">
+  <div id="modalEdit">
+    <h3 id="modalEditTitle">Editar</h3>
+    <div id="modalEditContent"></div>
     <div class="modal-actions">
-      <button class="btn btn-avulso" onclick="salvarEdicaoTutor()">Salvar</button>
-      <button class="btn btn-secondary" onclick="fecharModalTutor()">Cancelar</button>
+      <button class="btn btn-avulso" onclick="salvarEdicao()">Salvar</button>
+      <button class="btn btn-secondary" onclick="fecharModalEdit()">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- ======= MODAL EDIÇÃO DE ANIMAL ======= -->
-<div id="modalAnimalOverlay" class="modal-overlay">
-  <div class="modal" id="modalAnimal">
-    <h3>Editar Cliente</h3>
-    <div class="field">
-      <label>Nome do Cliente</label>
-      <input type="text" id="editAnimalNome">
-    </div>
-    <div class="field">
-      <label>Foto (opcional)</label>
-      <div class="modal-row" style="align-items:center;">
-        <img id="editAnimalPreview" class="preview" alt="Prévia">
-        <input type="file" id="editAnimalFoto" accept="image/*" onchange="previewEditAnimalFoto(event)">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-avulso" onclick="salvarEdicaoAnimal()">Salvar</button>
-      <button class="btn btn-secondary" onclick="fecharModalAnimal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <span>Estética Animal</span>
-  <span class="dot"></span>
-  <span>Versão <strong>3.0</strong></span>
-  <span class="dot"></span>
-  <span>Produzido por <strong>Leocir</strong></span>
-</footer>
+<footer>Versão 3.1 — Produzido por Leocir</footer>
 
 <script>
 /* ==================== FIREBASE INIT ==================== */
@@ -297,9 +245,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-/* ==================== UTIL / HELPERS ==================== */
+/* ==================== UTIL ==================== */
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-// datas locais (evita fuso)
 const pad2=n=>String(n).padStart(2,'0');
 const toYMD=(y,m,d)=>`${y}-${pad2(m)}-${pad2(d)}`;
 function addDaysYMD(ymd, days){
@@ -313,526 +260,249 @@ async function entrar(){
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   if(!email||!pass){ alert('Informe email e senha'); return; }
-  try{
-    await auth.signInWithEmailAndPassword(email, pass);
-  }catch(e){
-    alert('Falha no login: '+(e.message||e));
-  }
+  try{ await auth.signInWithEmailAndPassword(email, pass); }
+  catch(e){ alert('Falha no login: '+(e.message||e)); }
 }
 async function criarConta(){
   const email=document.getElementById('loginEmail').value.trim();
   const pass=document.getElementById('loginPass').value;
   if(!email||!pass){ alert('Informe email e senha'); return; }
-  try{
-    await auth.createUserWithEmailAndPassword(email, pass);
-    alert('Conta criada com sucesso!');
-  }catch(e){
-    alert('Erro ao criar conta: '+(e.message||e));
-  }
+  try{ await auth.createUserWithEmailAndPassword(email, pass); alert('Conta criada!'); }
+  catch(e){ alert('Erro: '+(e.message||e)); }
 }
 async function resetSenha(){
   const email=document.getElementById('loginEmail').value.trim();
-  if(!email){ alert('Informe o email para recuperar a senha'); return; }
-  try{
-    await auth.sendPasswordResetEmail(email);
-    alert('Email de recuperação enviado.');
-  }catch(e){
-    alert('Erro ao enviar recuperação: '+(e.message||e));
-  }
+  if(!email){ alert('Informe o email'); return; }
+  try{ await auth.sendPasswordResetEmail(email); alert('Email enviado.'); }
+  catch(e){ alert('Erro: '+(e.message||e)); }
 }
-async function sair(e){
-  if(e) e.preventDefault();
-  await auth.signOut();
-}
+async function sair(e){ if(e) e.preventDefault(); await auth.signOut(); }
 
 auth.onAuthStateChanged(async (user)=>{
-  if(user){
-    document.getElementById('loginScreen').style.display='none';
-    mostrarAgenda();
-    await refreshCacheTutores();
-    await renderCalendario();
-  }else{
-    document.getElementById('loginScreen').style.display='flex';
-  }
+  if(user){ document.getElementById('loginScreen').style.display='none'; mostrarAgenda(); await refreshCacheTutores(); await renderCalendario(); }
+  else{ document.getElementById('loginScreen').style.display='flex'; }
 });
-
+</script>
+<script>
 /* ==================== NAV ==================== */
 function setAtivo(id){document.querySelectorAll('nav a').forEach(a=>a.classList.remove('ativo'));document.getElementById(id).classList.add('ativo');}
 function mostrarAgenda(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='flex';document.getElementById('tutoresSec').style.display='none';setAtivo('navAgenda');}
-async function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');await renderTutores();}
+async function mostrarTutores(e){if(e)e.preventDefault();document.getElementById('agendaMain').style.display='none';document.getElementById('tutoresSec').style.display='grid';setAtivo('navTutores');await listarTutores();}
 
-/* ==================== CACHE TUTORES/ANIMAIS ==================== */
-let TUTORES_CACHE=[]; // [{id,nome,endereco,tel,animais:[{id,nome,foto}]}]
+/* ==================== CALENDARIO ==================== */
+let cacheTutores={}, cacheAnimais={}, cacheBanhos=[];
+function getTutorNome(id){return cacheTutores[id]?.nome||'Tutor?'}
+function getAnimalNome(tutorId, animalId){return cacheAnimais[tutorId]?.find(a=>a.id===animalId)?.nome||'Animal?'}
 async function refreshCacheTutores(){
-  const tutSnap=await db.collection('tutores').get();
-  const arr=[];
-  for(const doc of tutSnap.docs){
-    const t={id:doc.id, ...doc.data(), animais:[]};
-    const aniSnap=await db.collection('tutores').doc(doc.id).collection('animais').get();
-    aniSnap.forEach(a=> t.animais.push({id:a.id, ...a.data()}));
-    arr.push(t);
-  }
-  TUTORES_CACHE=arr;
-  await atualizarTutoresSelect();
+  cacheTutores={}; cacheAnimais={};
+  const snap=await db.collection('tutores').get();
+  snap.forEach(doc=>{
+    cacheTutores[doc.id]=doc.data();
+    cacheAnimais[doc.id]=doc.data().animais||[];
+  });
 }
-
-/* ==================== CALENDÁRIO ==================== */
 async function renderCalendario(){
-  const calendario=document.getElementById('calendario');
-  calendario.innerHTML='';
-
-  // carrega TODOS os banhos (simples). Em produção: filtrar por intervalo.
-  const banhosSnap=await db.collection('banhos').get();
-  const banhos=banhosSnap.docs.map(d=>({id:d.id, ...d.data()}));
-
-  const porData=new Map();
-  for(const b of banhos){
-    if(!porData.has(b.data)) porData.set(b.data,[]);
-    porData.get(b.data).push(b);
-  }
-
+  cacheBanhos=[];
+  const snap=await db.collection('banhos').get();
+  snap.forEach(doc=>cacheBanhos.push({id:doc.id,...doc.data()}));
+  const cont=document.getElementById('calendario'); cont.innerHTML='';
   const hoje=new Date();
-  const baseAno=hoje.getFullYear();
-  const baseMes=hoje.getMonth();
-
-  for(let offset=0; offset<2; offset++){
-    const primeiroDiaMes=new Date(baseAno, baseMes+offset, 1);
-    const ano=primeiroDiaMes.getFullYear();
-    const mes=primeiroDiaMes.getMonth();
-    const nomeMes=primeiroDiaMes.toLocaleString('pt-BR',{month:'long'});
-    const diasNoMes=new Date(ano, mes+1, 0).getDate();
-
-    const mesDiv=document.createElement('div');
-    mesDiv.className='mes';
-    mesDiv.innerHTML=`<h2>${nomeMes} ${ano}</h2>
-      <div class="dias-semana">
-        <div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div><div>Dom</div>
-      </div>`;
-
-    const grid=document.createElement('div');
-    grid.className='dias';
-
-    // Segunda a domingo
-    const inicio=(new Date(ano, mes, 1).getDay()+6)%7;
-    for(let i=0;i<inicio;i++) grid.appendChild(document.createElement('div'));
-
-    for(let d=1; d<=diasNoMes; d++){
-      const cell=document.createElement('div');
-      cell.className='dia';
-      if(offset===0 && d===hoje.getDate()) cell.classList.add('hoje');
-
-      const num=document.createElement('div');
-      num.className='dia-num';
-      num.textContent=d;
-      cell.appendChild(num);
-
-      const dayStr=toYMD(ano, mes+1, d);
-      const lista=porData.get(dayStr)||[];
-      lista.sort((a,b)=> a.horario.localeCompare(b.horario));
-      for(const b of lista){
+  for(let offset=-1; offset<=1; offset++){
+    const dt=new Date(hoje.getFullYear(), hoje.getMonth()+offset, 1);
+    const y=dt.getFullYear(), m=dt.getMonth();
+    const dias=new Date(y,m+1,0).getDate();
+    const primeiro=new Date(y,m,1).getDay();
+    const mesDiv=document.createElement('div'); mesDiv.className='mes';
+    mesDiv.innerHTML=`<h2>${dt.toLocaleDateString('pt-BR',{month:'long', year:'numeric'})}</h2>`;
+    mesDiv.innerHTML+=`<div class="dias-semana"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div></div>`;
+    const grid=document.createElement('div'); grid.className='dias';
+    for(let i=0;i<primeiro;i++) grid.appendChild(document.createElement('div'));
+    for(let d=1;d<=dias;d++){
+      const dd=document.createElement('div'); dd.className='dia';
+      if(d===hoje.getDate()&&m===hoje.getMonth()&&y===hoje.getFullYear()) dd.classList.add('hoje');
+      dd.innerHTML=`<div class="dia-num">${d}</div>`;
+      const ymd=toYMD(y,m+1,d);
+      cacheBanhos.filter(b=>b.data===ymd).sort((a,b)=>a.horario.localeCompare(b.horario)).forEach(b=>{
         const btn=document.createElement('button');
-        btn.className='badge '+(b.tipo==='pacote'?'pacote':'avulso');
-        const nomeAnimal = getAnimalNome(b.tutorId,b.animalId);
-        btn.textContent=`${nomeAnimal} — ${b.horario}`;
-        if(b.obs && b.obs.trim()){
-          btn.title = b.obs; // tooltip com observações
-        }
-        btn.onclick=()=>abrirModalBanho(b.id);
-        cell.appendChild(btn);
-      }
-
-      grid.appendChild(cell);
+        btn.className='badge '+(b.pacoteId?'pacote':'avulso');
+        btn.textContent=`${getAnimalNome(b.tutorId,b.animalId)} — ${b.horario}`;
+        btn.title=b.obs||'';
+        btn.onclick=()=>abrirModal(b.id);
+        dd.appendChild(btn);
+      });
+      grid.appendChild(dd);
     }
-
-    mesDiv.appendChild(grid);
-    calendario.appendChild(mesDiv);
+    mesDiv.appendChild(grid); cont.appendChild(mesDiv);
   }
 }
+function togglePacoteOptions(){document.getElementById('pacoteOptions').style.display=document.getElementById('tipoBanho').value==='pacote'?'block':'none';}
+async function carregarAnimais(){
+  const tutorId=document.getElementById('tutorSelect').value;
+  const sel=document.getElementById('animalSelect'); sel.innerHTML='<option value="">Selecione um cliente</option>';
+  if(!tutorId)return;
+  (cacheAnimais[tutorId]||[]).forEach(a=>{const op=document.createElement('option'); op.value=a.id; op.textContent=a.nome; sel.appendChild(op);});
+}
+async function adicionarBanho(){
+  const tipo=document.getElementById('tipoBanho').value;
+  const tutorId=document.getElementById('tutorSelect').value;
+  const animalId=document.getElementById('animalSelect').value;
+  const data=document.getElementById('dataBanho').value;
+  const horario=document.getElementById('horario').value;
+  const obs=document.getElementById('obs').value.trim();
+  if(!tutorId||!animalId||!data||!horario){alert('Preencha todos os campos');return;}
+  if(tipo==='avulso'){
+    await db.collection('banhos').add({tipo,tutorId,animalId,data,horario,obs});
+  }else{
+    const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
+    const pacoteId=uid();
+    let atual=data;
+    for(let i=0;i<qtd;i++){
+      await db.collection('banhos').add({tipo,tutorId,animalId,data:atual,horario,pacoteId,obs});
+      atual=addDaysYMD(atual,7);
+    }
+  }
+  document.getElementById('obs').value='';
+  await renderCalendario();
+}
 
-/* ==================== TUTORES / CLIENTES ==================== */
+/* ==================== MODAL BANHO ==================== */
+let banhoAlvo=null;
+function abrirModal(id){
+  banhoAlvo=cacheBanhos.find(b=>b.id===id); if(!banhoAlvo) return;
+  document.getElementById('modalOverlay').style.display='flex';
+  document.getElementById('modalInfo').textContent=`${getTutorNome(banhoAlvo.tutorId)} — ${getAnimalNome(banhoAlvo.tutorId,banhoAlvo.animalId)} (${banhoAlvo.data})`;
+  document.getElementById('modalHorario').value=banhoAlvo.horario;
+  document.getElementById('modalObs').value=banhoAlvo.obs||'';
+  document.getElementById('btnExcluirPacote').style.display=banhoAlvo.pacoteId?'block':'none';
+}
+function fecharModal(){document.getElementById('modalOverlay').style.display='none';}
+async function salvarEdicaoBanho(){
+  if(!banhoAlvo)return;
+  const novoHorario=document.getElementById('modalHorario').value;
+  const novaObs=document.getElementById('modalObs').value.trim();
+  if(document.getElementById('modalAplicarPacote').value==='sim' && banhoAlvo.pacoteId){
+    const snap=await db.collection('banhos').where('pacoteId','==',banhoAlvo.pacoteId).get();
+    const batch=db.batch(); snap.forEach(doc=>batch.update(doc.ref,{horario:novoHorario, obs:novaObs}));
+    await batch.commit();
+  }else{
+    await db.collection('banhos').doc(banhoAlvo.id).update({horario:novoHorario, obs:novaObs});
+  }
+  fecharModal(); await renderCalendario();
+}
+async function excluirEsteBanho(){if(!banhoAlvo)return; await db.collection('banhos').doc(banhoAlvo.id).delete(); fecharModal(); await renderCalendario();}
+async function excluirPacote(){if(!banhoAlvo||!banhoAlvo.pacoteId)return; const snap=await db.collection('banhos').where('pacoteId','==',banhoAlvo.pacoteId).get(); const batch=db.batch(); snap.forEach(doc=>batch.delete(doc.ref)); await batch.commit(); fecharModal(); await renderCalendario();}
+
+/* ==================== TUTORES ==================== */
 async function adicionarTutor(){
   const nome=document.getElementById('tutorNome').value.trim();
   const endereco=document.getElementById('tutorEndereco').value.trim();
-  const tel=document.getElementById('tutorTelefone').value.trim();
-  if(!nome) return alert('Informe o nome');
-
-  await db.collection('tutores').add({nome,endereco,tel});
+  const telefone=document.getElementById('tutorTelefone').value.trim();
+  if(!nome){alert('Informe o nome');return;}
+  await db.collection('tutores').add({nome,endereco,telefone,animais:[]});
   document.getElementById('tutorNome').value='';
   document.getElementById('tutorEndereco').value='';
   document.getElementById('tutorTelefone').value='';
-  await refreshCacheTutores();
-  await renderTutores();
+  await refreshCacheTutores(); await listarTutores();
 }
 async function adicionarAnimal(){
   const tutorId=document.getElementById('animalTutor').value;
   const nome=document.getElementById('animalNome').value.trim();
   const file=document.getElementById('animalFoto').files[0];
-  if(!tutorId) return alert('Selecione um tutor');
-  if(!nome) return alert('Informe o nome do cliente');
-
-  let foto='';
+  if(!tutorId||!nome){alert('Preencha os campos');return;}
+  let fotoBase64='';
   if(file){
     const reader=new FileReader();
     reader.onload=async e=>{
-      foto=e.target.result;
-      await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
-      document.getElementById('animalNome').value='';
-      document.getElementById('animalFoto').value='';
-      await refreshCacheTutores();
-      await renderTutores();
-      await atualizarTutoresSelect();
+      fotoBase64=e.target.result;
+      await salvarAnimal(tutorId,nome,fotoBase64);
     };
     reader.readAsDataURL(file);
-  } else {
-    await db.collection('tutores').doc(tutorId).collection('animais').add({nome,foto});
-    document.getElementById('animalNome').value='';
-    document.getElementById('animalFoto').value='';
-    await refreshCacheTutores();
-    await renderTutores();
-    await atualizarTutoresSelect();
+  }else{
+    await salvarAnimal(tutorId,nome,fotoBase64);
   }
 }
-async function renderTutores(){
-  const container=document.getElementById('tutoresContainer');
-  const sel=document.getElementById('animalTutor');
-  container.innerHTML='';
-  sel.innerHTML='<option value="">Selecione um Tutor</option>';
-
-  for(const t of TUTORES_CACHE){
-    sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`;
-
-    const card=document.createElement('div');
-    card.className='tutor-card';
-
-    const header=document.createElement('div');
-    header.className='tutor-header';
-
-    const titulo=document.createElement('div');
-    titulo.innerHTML=`<strong>${t.nome}</strong><br>${t.endereco||'-'} ${t.tel?(' - '+t.tel):''}`;
-    header.appendChild(titulo);
-
-    const actions=document.createElement('div');
-    actions.className='tutor-actions';
-
-    const btnEdit=document.createElement('i');
-    btnEdit.className="fa-solid fa-pen-to-square icon-btn";
-    btnEdit.title='Editar tutor';
-    btnEdit.onclick=()=>editarTutor(t.id);
-    actions.appendChild(btnEdit);
-
-    const btnExcluir=document.createElement('i');
-    btnExcluir.className="fa-solid fa-trash icon-btn";
-    btnExcluir.title='Excluir tutor';
-    btnExcluir.onclick=()=>excluirTutor(t.id);
-    actions.appendChild(btnExcluir);
-
-    header.appendChild(actions);
-    card.appendChild(header);
-
-    t.animais.forEach(a=>{
-      const line=document.createElement('div');
-      line.className='animal';
-
-      const left=document.createElement('div');
-      left.className='animal-left';
-      if(a.foto){
-        const img=document.createElement('img');
-        img.src=a.foto;
-        img.alt=a.nome;
-        left.appendChild(img);
-      } else {
-        const placeholder=document.createElement('div');
-        placeholder.style.width='40px'; placeholder.style.height='40px';
-        placeholder.style.borderRadius='50%'; placeholder.style.background='#f3f3f3'; placeholder.style.border='2px solid #fff';
-        left.appendChild(placeholder);
-      }
-      const span=document.createElement('span');
-      span.textContent=a.nome;
-      left.appendChild(span);
-
-      const right=document.createElement('div');
-      right.style.display='flex'; right.style.gap='10px';
-
-      const editAni=document.createElement('i');
-      editAni.className="fa-solid fa-pen-to-square icon-btn";
-      editAni.title='Editar cliente';
-      editAni.onclick=()=>editarAnimal(t.id,a.id);
-      right.appendChild(editAni);
-
-      const delAni=document.createElement('i');
-      delAni.className="fa-solid fa-trash icon-btn";
-      delAni.title='Excluir cliente';
-      delAni.onclick=()=>excluirAnimal(t.id,a.id);
-      right.appendChild(delAni);
-
-      line.appendChild(left);
-      line.appendChild(right);
-      card.appendChild(line);
+async function salvarAnimal(tutorId,nome,fotoBase64){
+  const animal={id:uid(), nome, foto:fotoBase64};
+  await db.collection('tutores').doc(tutorId).update({animais:firebase.firestore.FieldValue.arrayUnion(animal)});
+  document.getElementById('animalNome').value=''; document.getElementById('animalFoto').value='';
+  await refreshCacheTutores(); await listarTutores();
+}
+async function listarTutores(){
+  await refreshCacheTutores();
+  const cont=document.getElementById('tutoresContainer'); cont.innerHTML='';
+  const selTutor=document.getElementById('tutorSelect'); selTutor.innerHTML='<option value="">Selecione um tutor</option>';
+  const selAnimalTutor=document.getElementById('animalTutor'); selAnimalTutor.innerHTML='<option value="">Selecione tutor</option>';
+  for(const [id,tutor] of Object.entries(cacheTutores)){
+    const card=document.createElement('div'); card.className='tutor-card';
+    const span=document.createElement('span'); span.textContent=`${tutor.nome} — ${tutor.telefone} — ${tutor.endereco}`;
+    const edit=document.createElement('i'); edit.className='fa fa-pen edit-icon'; edit.onclick=()=>abrirModalEdit('tutor',id);
+    span.appendChild(edit); card.appendChild(span);
+    (tutor.animais||[]).forEach(a=>{
+      const div=document.createElement('div'); div.className='animal';
+      const left=document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='8px';
+      const img=document.createElement('img'); img.src=a.foto||'https://via.placeholder.com/50';
+      left.appendChild(img); const nm=document.createElement('span'); nm.textContent=a.nome; left.appendChild(nm);
+      const editA=document.createElement('i'); editA.className='fa fa-pen edit-icon'; editA.onclick=()=>abrirModalEdit('animal',id,a.id);
+      div.appendChild(left); div.appendChild(editA); card.appendChild(div);
     });
-
-    container.appendChild(card);
+    cont.appendChild(card);
+    const op=document.createElement('option'); op.value=id; op.textContent=tutor.nome; selTutor.appendChild(op);
+    const op2=document.createElement('option'); op2.value=id; op2.textContent=tutor.nome; selAnimalTutor.appendChild(op2);
   }
 }
-async function atualizarTutoresSelect(){
-  const sel=document.getElementById('tutorSelect');
-  sel.innerHTML='<option value="">Selecione um tutor</option>';
-  TUTORES_CACHE.forEach(t=> sel.innerHTML+=`<option value="${t.id}">${t.nome}</option>`);
-  await carregarAnimais();
-}
-async function carregarAnimais(){
-  const tutorId=document.getElementById('tutorSelect').value;
-  const sel=document.getElementById('animalSelect');
-  sel.innerHTML='<option value="">Selecione um cliente</option>';
-  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
-  if(t) t.animais.forEach(a=> sel.innerHTML+=`<option value="${a.id}">${a.nome}</option>`);
-}
-function getAnimalNome(tutorId, animalId){
-  const t=TUTORES_CACHE.find(x=>x.id===tutorId);
-  if(!t) return 'Cliente';
-  const a=t.animais.find(x=>x.id===animalId);
-  return a? a.nome : 'Cliente';
-}
-async function excluirTutor(tutorId){
-  if(!confirm('Excluir este tutor, clientes e banhos vinculados?')) return;
-  // apaga subcoleção animais
-  const aniSnap=await db.collection('tutores').doc(tutorId).collection('animais').get();
-  const batch=db.batch();
-  aniSnap.forEach(doc=> batch.delete(doc.ref));
-  await batch.commit();
 
-  // apaga banhos do tutor
-  const banhosSnap=await db.collection('banhos').where('tutorId','==',tutorId).get();
-  const batch2=db.batch();
-  banhosSnap.forEach(doc=> batch2.delete(doc.ref));
-  await batch2.commit();
-
-  // apaga tutor
-  await db.collection('tutores').doc(tutorId).delete();
-
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
-  await renderCalendario();
-}
-async function excluirAnimal(tutorId, animalId){
-  if(!confirm('Excluir este cliente e banhos vinculados?')) return;
-  await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).delete();
-
-  // remove banhos deste animal
-  const banhosSnap=await db.collection('banhos').where('animalId','==',animalId).get();
-  const batch=db.batch();
-  banhosSnap.forEach(doc=> batch.delete(doc.ref));
-  await batch.commit();
-
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
-  await renderCalendario();
-}
-
-/* ======= EDIÇÃO: TUTOR ======= */
-let EDIT_TUTOR_ID=null;
-async function editarTutor(tutorId){
-  EDIT_TUTOR_ID=tutorId;
-  const snap=await db.collection('tutores').doc(tutorId).get();
-  const t=snap.data();
-  if(!t) return;
-  document.getElementById('editTutorNome').value = t.nome||'';
-  document.getElementById('editTutorEndereco').value = t.endereco||'';
-  document.getElementById('editTutorTelefone').value = t.tel||'';
-  document.getElementById('modalTutorOverlay').style.display='flex';
-}
-function fecharModalTutor(){
-  document.getElementById('modalTutorOverlay').style.display='none';
-  EDIT_TUTOR_ID=null;
-}
-async function salvarEdicaoTutor(){
-  if(!EDIT_TUTOR_ID) return;
-  const nome=document.getElementById('editTutorNome').value.trim();
-  const endereco=document.getElementById('editTutorEndereco').value.trim();
-  const tel=document.getElementById('editTutorTelefone').value.trim();
-  if(!nome){ alert('Informe o nome'); return; }
-  await db.collection('tutores').doc(EDIT_TUTOR_ID).update({nome,endereco,tel});
-  fecharModalTutor();
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
-}
-
-/* ======= EDIÇÃO: ANIMAL ======= */
-let EDIT_ANIMAL_TUTOR_ID=null;
-let EDIT_ANIMAL_ID=null;
-let EDIT_ANIMAL_FOTO_DATAURL=null;
-
-async function editarAnimal(tutorId, animalId){
-  EDIT_ANIMAL_TUTOR_ID=tutorId;
-  EDIT_ANIMAL_ID=animalId;
-  EDIT_ANIMAL_FOTO_DATAURL=null;
-
-  const snap=await db.collection('tutores').doc(tutorId).collection('animais').doc(animalId).get();
-  const a=snap.data();
-  if(!a) return;
-  document.getElementById('editAnimalNome').value = a.nome || '';
-  const prev=document.getElementById('editAnimalPreview');
-  prev.src = a.foto || '';
-  prev.style.display = a.foto ? 'block' : 'none';
-  document.getElementById('editAnimalFoto').value='';
-  document.getElementById('modalAnimalOverlay').style.display='flex';
-}
-function previewEditAnimalFoto(ev){
-  const file=ev.target.files && ev.target.files[0];
-  if(!file){ EDIT_ANIMAL_FOTO_DATAURL=null; return; }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    EDIT_ANIMAL_FOTO_DATAURL = e.target.result;
-    const prev=document.getElementById('editAnimalPreview');
-    prev.src = EDIT_ANIMAL_FOTO_DATAURL;
-    prev.style.display='block';
-  };
-  reader.readAsDataURL(file);
-}
-function fecharModalAnimal(){
-  document.getElementById('modalAnimalOverlay').style.display='none';
-  EDIT_ANIMAL_TUTOR_ID=null;
-  EDIT_ANIMAL_ID=null;
-  EDIT_ANIMAL_FOTO_DATAURL=null;
-}
-async function salvarEdicaoAnimal(){
-  if(!EDIT_ANIMAL_TUTOR_ID || !EDIT_ANIMAL_ID) return;
-  const nome=document.getElementById('editAnimalNome').value.trim();
-  const payload={ nome };
-  if(EDIT_ANIMAL_FOTO_DATAURL!==null){ // usuário escolheu nova foto
-    payload.foto = EDIT_ANIMAL_FOTO_DATAURL;
+/* ==================== MODAL EDIT TUTOR/ANIMAL ==================== */
+let editContext=null;
+function abrirModalEdit(tipo,tutorId,animalId=null){
+  editContext={tipo,tutorId,animalId};
+  const cont=document.getElementById('modalEditContent');
+  cont.innerHTML='';
+  if(tipo==='tutor'){
+    const t=cacheTutores[tutorId];
+    cont.innerHTML=`<label>Nome</label><input type="text" id="editTutorNome" value="${t.nome}"><br>
+                    <label>Endereço</label><input type="text" id="editTutorEndereco" value="${t.endereco||''}"><br>
+                    <label>Telefone</label><input type="text" id="editTutorTelefone" value="${t.telefone||''}">`;
+    document.getElementById('modalEditTitle').textContent='Editar Tutor';
+  }else{
+    const a=cacheAnimais[tutorId].find(x=>x.id===animalId);
+    cont.innerHTML=`<label>Nome</label><input type="text" id="editAnimalNome" value="${a.nome}"><br>
+                    <label>Foto</label><input type="file" id="editAnimalFoto" accept="image/*"><br>
+                    <img src="${a.foto||'https://via.placeholder.com/50'}" width="80" style="border-radius:8px;margin-top:6px;">`;
+    document.getElementById('modalEditTitle').textContent='Editar Cliente';
   }
-  await db.collection('tutores').doc(EDIT_ANIMAL_TUTOR_ID).collection('animais').doc(EDIT_ANIMAL_ID).update(payload);
-  fecharModalAnimal();
-  await refreshCacheTutores();
-  await renderTutores();
-  await atualizarTutoresSelect();
-  await renderCalendario();
+  document.getElementById('modalOverlayEdit').style.display='flex';
 }
-
-/* ==================== BANHOS ==================== */
-function togglePacoteOptions(){
-  const tipo=document.getElementById('tipoBanho').value;
-  document.getElementById('pacoteOptions').style.display = (tipo==='pacote') ? 'block' : 'none';
-}
-
-async function adicionarBanho(){
-  const tipo=document.getElementById('tipoBanho').value;
-  const tutorId=document.getElementById('tutorSelect').value;
-  const animalId=document.getElementById('animalSelect').value;
-  const data=document.getElementById('dataBanho').value; // YYYY-MM-DD
-  const horario=document.getElementById('horario').value;
-  const valor=document.getElementById('valor').value || '';
-  const obs=document.getElementById('obs').value || '';
-
-  if(!tutorId || !animalId || !data || !horario){
-    alert('Preencha tutor, cliente, data e horário.');
-    return;
-  }
-
-  const pacoteId = (tipo==='pacote') ? uid() : null;
-
-  if(tipo==='avulso'){
-    const banho = { tipo, tutorId, animalId, data, horario, valor, obs, pacoteId:null };
-    await db.collection('banhos').add(banho);
-  } else {
-    const qtd=parseInt(document.getElementById('pacoteSelecionado').value,10);
-    let atual=data;
-    for(let i=0;i<qtd;i++){
-      if(i>0) atual = addDaysYMD(atual, 7);
-      const banho={ tipo, tutorId, animalId, data:atual, horario, valor, obs, pacoteId };
-      await db.collection('banhos').add(banho);
+function fecharModalEdit(){document.getElementById('modalOverlayEdit').style.display='none';}
+async function salvarEdicao(){
+  if(!editContext)return;
+  if(editContext.tipo==='tutor'){
+    const nome=document.getElementById('editTutorNome').value.trim();
+    const endereco=document.getElementById('editTutorEndereco').value.trim();
+    const telefone=document.getElementById('editTutorTelefone').value.trim();
+    await db.collection('tutores').doc(editContext.tutorId).update({nome,endereco,telefone});
+  }else{
+    const nome=document.getElementById('editAnimalNome').value.trim();
+    const file=document.getElementById('editAnimalFoto').files[0];
+    const t=cacheAnimais[editContext.tutorId]; const arr=[...t];
+    const idx=arr.findIndex(x=>x.id===editContext.animalId);
+    let foto=arr[idx].foto;
+    if(file){
+      const reader=new FileReader();
+      reader.onload=async e=>{
+        foto=e.target.result;
+        arr[idx]={...arr[idx], nome, foto};
+        await db.collection('tutores').doc(editContext.tutorId).update({animais:arr});
+        await refreshCacheTutores(); await listarTutores(); fecharModalEdit();
+      };
+      reader.readAsDataURL(file);
+      return;
+    }else{
+      arr[idx]={...arr[idx], nome, foto};
+      await db.collection('tutores').doc(editContext.tutorId).update({animais:arr});
     }
   }
-
-  await renderCalendario();
-
-  // limpa campos
-  document.getElementById('tipoBanho').value='avulso';
-  togglePacoteOptions();
-  document.getElementById('tutorSelect').value='';
-  await carregarAnimais();
-  document.getElementById('dataBanho').value='';
-  document.getElementById('horario').value='';
-  document.getElementById('valor').value='';
-  document.getElementById('obs').value='';
+  await refreshCacheTutores(); await listarTutores(); fecharModalEdit();
 }
-
-/* ==================== MODAL: editar/excluir BANHO ==================== */
-let modalBanhoId=null;
-async function abrirModalBanho(banhoId){
-  modalBanhoId=banhoId;
-  const ref=db.collection('banhos').doc(banhoId);
-  const b=(await ref.get()).data();
-  if(!b) return;
-
-  const info = `${getAnimalNome(b.tutorId,b.animalId)} — ${b.data} às ${b.horario} ${b.tipo==='pacote'?'(pacote)':'(avulso)'}`;
-  document.getElementById('modalInfo').textContent=info;
-  document.getElementById('modalHorario').value=b.horario;
-  document.getElementById('modalObs').value=b.obs||'';
-  document.getElementById('modalAplicarPacote').value='nao';
-  document.getElementById('btnExcluirPacote').style.display = (b.pacoteId) ? 'block':'none';
-
-  document.getElementById('modalBanhoOverlay').style.display='flex';
-}
-function fecharModalBanho(){
-  document.getElementById('modalBanhoOverlay').style.display='none';
-  modalBanhoId=null;
-}
-async function salvarEdicaoBanho(){
-  const novoHorario=document.getElementById('modalHorario').value;
-  const novasObs=(document.getElementById('modalObs').value||'');
-  const aplicar=document.getElementById('modalAplicarPacote').value==='sim';
-  if(!modalBanhoId || !novoHorario) return;
-
-  const alvoRef=db.collection('banhos').doc(modalBanhoId);
-  const alvoSnap=await alvoRef.get();
-  const alvo=alvoSnap.data();
-  if(!alvo) return;
-
-  if(aplicar && alvo.pacoteId){
-    const snap=await db.collection('banhos').where('pacoteId','==',alvo.pacoteId).get();
-    const batch=db.batch();
-    snap.forEach(doc=> batch.update(doc.ref,{horario:novoHorario, obs:novasObs}));
-    await batch.commit();
-  }else{
-    await alvoRef.update({horario:novoHorario, obs:novasObs});
-  }
-
-  fecharModalBanho();
-  await renderCalendario();
-}
-async function excluirEsteBanho(){
-  if(!modalBanhoId) return;
-  if(!confirm('Deseja excluir apenas este banho?')) return;
-  await db.collection('banhos').doc(modalBanhoId).delete();
-  fecharModalBanho();
-  await renderCalendario();
-}
-async function excluirPacote(){
-  if(!modalBanhoId) return;
-  const alvo=await db.collection('banhos').doc(modalBanhoId).get();
-  const b=alvo.data();
-  if(!b || !b.pacoteId) return;
-  if(!confirm('Deseja excluir TODOS os banhos deste pacote?')) return;
-
-  const snap=await db.collection('banhos').where('pacoteId','==',b.pacoteId).get();
-  const batch=db.batch();
-  snap.forEach(doc=> batch.delete(doc.ref));
-  await batch.commit();
-
-  fecharModalBanho();
-  await renderCalendario();
-}
-
-/* ==================== INICIALIZAÇÃO ==================== */
-document.addEventListener('DOMContentLoaded', async ()=>{
-  togglePacoteOptions();
-  // A UI será liberada após login (onAuthStateChanged).
-});
 </script>
-
 </body>
 </html>
